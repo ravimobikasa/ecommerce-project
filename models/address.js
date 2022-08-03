@@ -2,8 +2,12 @@ const { DataTypes, Model } = require('sequelize')
 const sequelize = require('../config/db')
 
 class Address extends Model {
-  static associate(models) {}
+  static associate(models) {
+    const { User } = models
+    Address.belongsTo(User)
+  }
 }
+
 Address.init(
   {
     userId: {
