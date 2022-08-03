@@ -1,44 +1,39 @@
 const { DataTypes, Model } = require('sequelize')
 const sequelize = require('../config/db')
 
-class User extends Model {
+class Address extends Model {
   static associate(models) {}
-
-  toJSON() {
-    const user = this.get()
-    delete user.password
-    return user
-  }
 }
-
-User.init(
+Address.init(
   {
-    firstName: {
+    userId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    line1: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    lastName: {
+    line2: {
       type: DataTypes.STRING,
     },
-    email: {
+    landmark: {
       type: DataTypes.STRING,
-      unique: {
-        msg: 'Email Must be unique',
-      },
-      validate: {
-        isEmail: true,
-      },
-      allowNull: false,
     },
-    password: {
+    city: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    phoneNumber: {
+    state: {
       type: DataTypes.STRING,
-      unique: {
-        msg: 'Phone Number Must be unique',
-      },
+      allowNull: false,
+    },
+    country: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    pincode: {
+      type: DataTypes.STRING,
       allowNull: false,
     },
   },
@@ -47,4 +42,4 @@ User.init(
   }
 )
 
-module.exports = User
+module.exports = Address

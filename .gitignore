@@ -105,3 +105,5 @@ dist
 
 # Webstrome file removed
 .idea
+# vscode file removed
+.vscode
