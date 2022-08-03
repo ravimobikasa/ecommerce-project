@@ -3,50 +3,50 @@ const sequelize = require("../config/db");
 
 class User extends Model {
 
-    static associate(models) {
-    }
+  static associate(models) {
+  }
 
-    toJSON() {
-        const user = this.get();
-        delete user.password;
-        return user;
-    }
+  toJSON() {
+    const user = this.get();
+    delete user.password;
+    return user;
+  }
 }
 
 
 User.init({
 
-        firstName: {
-            type: DataTypes.STRING,
-            allowNull: false,
+      firstName: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      lastName: {
+        type: DataTypes.STRING
+      },
+      email: {
+        type: DataTypes.STRING,
+        unique: {
+          msg: "Email Must be unique",
         },
-        lastName: {
-            type: DataTypes.STRING
+        validate: {
+          isEmail: true,
         },
-        email: {
-            type: DataTypes.STRING,
-            unique: {
-                msg: "Email Must be unique",
-            },
-            validate: {
-                isEmail: true,
-            },
-            allowNull: false,
+        allowNull: false,
+      },
+      password: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      phoneNumber: {
+        type: DataTypes.STRING,
+        unique: {
+          msg: "Phone Number Must be unique",
         },
-        password: {
-            type: DataTypes.STRING,
-            allowNull: false,
-        },
-        phoneNumber: {
-            type: DataTypes.STRING,
-            unique: {
-                msg: "Phone Number Must be unique",
-            },
-            allowNull: false,
-        },
+        allowNull: false,
+      },
     },
     {
-        sequelize,
+      sequelize,
     }
 );
 
