@@ -7,8 +7,8 @@ const validate = (validateSchema) => {
     const Validation = schema.validate(req.body)
     if (Validation.error) {
       req.errors = Validation.error.details[0].message
-    } 
-      next()
+    }
+    next()
   }
 }
 
