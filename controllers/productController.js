@@ -10,6 +10,7 @@ const addProduct = async (req, res) => {
       title,
       imageUrl: req.file.filename,
       price,
+
       descrption: description,
     })
     res.json(result)
@@ -19,6 +20,9 @@ const addProduct = async (req, res) => {
 }
 const allProducts = async (req, res) => {
   try {
+    const result = await Products.findAll()
+
+    res.json(result)
   } catch (err) {
     res.json(err)
   }
