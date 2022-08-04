@@ -8,10 +8,25 @@ const Product = require('./products')
  * Relationship mapping.
  * */
 
-User.associate({ Address, OrderDetail })
-Address.associate({ User, OrderDetail })
-OrderDetail.associate({ User })
-OrderItem.associate({ OrderDetail, Product })
+User.hasMany(OrderDetail)
+User.hasMany(Address)
+
+Address.belongsTo(User, {
+  foreignKey: 'userId',
+})
+
+OrderDetail.belongsTo(User, {
+  foreignKey: 'userId',
+})
+OrderDetail.hasMany(OrderItem)
+
+OrderItem.belongsTo(OrderDetail, {
+  foreignKey: 'orderId',
+})
+
+OrderItem.belongsTo(Product, {
+  foreignKey: 'productId',
+})
 
 module.exports = {
   User,

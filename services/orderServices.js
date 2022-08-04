@@ -1,19 +1,24 @@
-const { OrderDetail, OrderItem } = require('../models')
+const { OrderDetail, OrderItem, User, Cart, Product } = require('../models')
 const UserService = require('../services/userServices')
 
-const createOrder = async (userId, cart, address) => {
+const createOrder = async (userId = 1) => {
+  const userDetail = await User.findByPk(userId, {
+    include: [
+      {
+        model: Cart,
+        include: [Product],
+      },
+    ],
+  })
 
-  const userDetail = {}
+  const { userFirstName, userLastName, userMobileNo, carts } = userDetail
 
-  let totalPrice,
-    totalQuantity = 0
+  let totalPrice, totalQuantity = 0
 
-  cart.forEach((item) => {
+  carts.forEach((item) => {
     totalQuantity += item.quantity
     totalPrice += item.totalPrice
   })
-
-  const { userFirstName, userLastName, userMobileNo } = userDetail
 
   let addressDetail = null
 
@@ -33,7 +38,7 @@ const createOrder = async (userId, cart, address) => {
     ...addressDetail,
   })
 
-  const orderItemsResult = await createOrderItem(orderDetail.orderId, cart)
+  const orderItemsResult = await createOrderItem(orderDetail.orderId, carts)
 
   return orderDetail
 }
