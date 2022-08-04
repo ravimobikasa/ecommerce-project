@@ -5,17 +5,10 @@ const validate = (validateSchema) => {
 
   return (req, res, next) => {
     const Validation = schema.validate(req.body)
-
     if (Validation.error) {
-      // res.json(Validation.error.details[0].message);
-      res.status(400).json({
-        message: 'error',
-        status: 400,
-        data: Validation.error.details[0].message,
-      })
-    } else {
+      req.errors = Validation.error.details[0].message
+    } 
       next()
-    }
   }
 }
 
