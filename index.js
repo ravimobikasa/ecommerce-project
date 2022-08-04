@@ -2,7 +2,7 @@ const express = require('express')
 const app = express()
 const dotenv = require('dotenv')
 const db = require('./config/db')
-const userRoutes = require('./routes/userRoutes')
+const productRoutes = require('./routes/productRoutes')
 
 dotenv.config()
 
@@ -10,7 +10,7 @@ app.use(express.json())
 
 // Routes
 
-app.use('/user', userRoutes)
+app.use('/product', productRoutes)
 
 db.sync()
   .then((result) => console.log('sync success'))

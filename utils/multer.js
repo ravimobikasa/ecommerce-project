@@ -19,7 +19,6 @@ const upload = multer({
 
 function checkFileType(file, cb) {
   const filetypes = /jpeg|jpg|png|gif/
-
   const extname = filetypes.test(path.extname(file.originalname).toLowerCase())
 
   const mimetype = filetypes.test(file.mimetype)
@@ -30,56 +29,23 @@ function checkFileType(file, cb) {
     cb('Error: Images Only!')
   }
 }
-
-const app = express()
-
-// app.use(express.static('./public'))
-
-app.post('/upload', (req, res, next) => {
+async function uploadData(req, res) {
   upload(req, res, (err) => {
     if (err) {
-      res.send({
-        msg: err,
-      })
+      res.send(err)
     } else {
+      console.log(req.file)
       if (req.file == undefined) {
-        res.send({
-          msg: 'Error: No File Selected!',
-        })
+        res.send('No file selected')
       }
-      //else {
-      // res.send({
-      //   msg: 'File Uploaded!',
-      //   file: `uploads/${req.file.filename}`,
-      // })
-      //}
-    }
-  })
-  next()
-})
-const uplaodData = (req, res, next) => {
-  upload(req, res, (err) => {
-    if (err) {
-      res.send({
-        msg: err,
-      })
-    } else {
-      if (req.file == undefined) {
-        res.send({
-          msg: 'Error: No File Selected!',
-        })
-      }
-      // else {
-      // res.send({
-      //   msg: 'File Uploaded!',
-      //   file: `uploads/${req.file.filename}`,
-      // })
+      //  else {
+      //   res.send({
+      //     msg: 'File Uploaded!',
+      //     file: `uploads/${req.file.filename}`,
+      //   })
       // }
     }
   })
-  next()
 }
 
-const port = 4000
-
-app.listen(port, () => console.log(`Server started on port ${port}`))
+module.exports = uploadData
