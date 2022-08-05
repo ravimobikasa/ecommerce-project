@@ -3,6 +3,7 @@ const router = express.Router()
 const validate = require('./../middleware/validate')
 const userValidation = require('./../validations/userValidation')
 const userController = require('./../controllers/userController')
+const verifySession = require('./../middleware/verifySession')
 
 router.route('/register').get((req, res) => {
   res.render('register')
@@ -15,6 +16,8 @@ router.route('/login').get((req, res) => {
 })
 
 router.route('/login').post(validate(userValidation.login), userController.login)
+
+router.route('/logout').all(userController.logOut)
 
 router.route('/test').get((req, res) => {
   res.render('test')

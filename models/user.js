@@ -2,12 +2,6 @@ const { DataTypes, Model } = require('sequelize')
 const sequelize = require('../config/db')
 
 class User extends Model {
-  static associate(models) {
-    const { OrderDetail, Address } = models
-    User.hasMany(OrderDetail)
-    User.hasMany(Address)
-  }
-
   toJSON() {
     const user = this.get()
     delete user.password
