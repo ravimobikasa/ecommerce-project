@@ -1,8 +1,6 @@
 const { hashPassword } = require('./../utils')
 const { User } = require('./../models')
 
-
-
 const registerUser = async (req, res) => {
   try {
     if (req.errors) {
@@ -55,16 +53,11 @@ const login = async (req, res) => {
 
     // session will go here
 
-<<<<<<< HEAD
-    // After login user redirect to shop page
-    res.redirect('/user/test')
-=======
     req.session.user = {
       id: user.id,
     }
     // After login user redirect to shop page
     res.send('Your Are now logged in')
->>>>>>> b1869c75ccfa68a5f7187d36baa932a16a7abf05
   } catch (err) {
     // will be shown on error page
     console.log('error', err)
