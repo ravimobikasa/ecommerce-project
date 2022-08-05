@@ -1,8 +1,10 @@
-'use strict'
-const { DataTypes, Model } = require('sequelize')
+const { Model, DataTypes } = require('sequelize')
 const sequelize = require('../config/db')
+
 class Cart extends Model {
-  static associate(models) {}
+  static associate(models) {
+    // define association here
+  }
 }
 Cart.init(
   {
@@ -20,11 +22,9 @@ Cart.init(
       defaultValue: 1,
     },
   },
-  Cart.associate = function(models) {
-    Cart.hasMany(models.CartItem);
-  },
   {
     sequelize,
   }
 )
+
 module.exports = Cart

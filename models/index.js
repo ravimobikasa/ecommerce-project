@@ -1,13 +1,8 @@
 const User = require('./user')
 const Address = require('./address')
 const OrderDetail = require('./orderDetail')
-const Cart=require('./cart')
-const cartItem = require('./cart-item')
-
-
-/**
- * Relationship mapping.
- * */
+const Cart = require('./cart')
+const Products = require('./products')
 
 User.associate({ Address, OrderDetail })
 Address.associate({ User, OrderDetail })
@@ -18,5 +13,5 @@ module.exports = {
   Address,
   OrderDetail,
   Cart,
-  cartItem
+  Products,
 }
