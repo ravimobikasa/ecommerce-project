@@ -1,7 +1,6 @@
 'use strict'
 const { DataTypes, Model } = require('sequelize')
 const sequelize = require('../config/db')
-
 class Cart extends Model {
   static associate(models) {}
 }
@@ -20,6 +19,9 @@ Cart.init(
       allowNull: false,
       defaultValue: 1,
     },
+  },
+  Cart.associate = function(models) {
+    Cart.hasMany(models.CartItem);
   },
   {
     sequelize,

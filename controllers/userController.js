@@ -17,6 +17,22 @@ const registerUser = async (req, res) => {
     })
 
     console.log('user', newUser)
+    res.redirect('/user/test')
+  } catch (err) {
+    console.log('error', err)
+  }
+}
+
+const login = async (req, res) => {
+  try {
+    const { email, password } = req.body
+
+    const user = await User.findOne({ where: { email } })
+
+    if (!user) {
+      return res.render('login', { errorMessage: 'Invalid Username or Password' })
+    }
+    res.redirect('/user/test')
   } catch (err) {
     console.log('error', err)
   }
@@ -24,4 +40,5 @@ const registerUser = async (req, res) => {
 
 module.exports = {
   registerUser,
+  login,
 }
