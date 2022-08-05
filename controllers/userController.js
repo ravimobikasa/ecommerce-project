@@ -1,6 +1,8 @@
 const { hashPassword } = require('./../utils')
 const { User } = require('./../models')
 
+
+
 const registerUser = async (req, res) => {
   try {
     if (req.errors) {
@@ -39,17 +41,26 @@ const login = async (req, res) => {
       return res.render('login', { errorMessage: 'Please enter correct email or password' })
     }
 
-    // seesion will go here
+    // session will go here
 
+    req.session.user = {
+      id: user.id,
+    }
     // After login user redirect to shop page
-    res.redirect('/user/test')
+    res.send('Your Are now logged in')
   } catch (err) {
     // will be shown on error page
     console.log('error', err)
   }
 }
 
+const logOut = (req, res) => {
+  req.session.destroy()
+  res.send('You are logout')
+}
+
 module.exports = {
   registerUser,
   login,
+  logOut,
 }
