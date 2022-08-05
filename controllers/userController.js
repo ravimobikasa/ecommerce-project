@@ -4,10 +4,22 @@ const { render } = require('ejs')
 
 const registerUser = async (req, res) => {
   try {
-    if(req.errors){
-      return res.render('register',{ errorMessage: req.errors })
+    if (req.errors) {
+      return res.render('register', { errorMessage: req.errors })
     }
     const { firstName, lastName, email, phoneNumber, password } = req.body
+
+    const user = await User.findOne({ where: { email } })
+
+    if (user) {
+      return res.render('register', { errorMessage: 'Email already exist' })
+    }
+
+    const result = await User.findOne({ where: { phoneNumber } })
+
+    if (result) {
+      return res.render('register', { errorMessage: 'Phone Number already exist' })
+    }
 
     const hashedPassword = await hashPassword.generateHash(password, 10)
 
@@ -21,15 +33,15 @@ const registerUser = async (req, res) => {
 
     res.redirect('/user/login')
   } catch (err) {
-    // will be shown on error page 
+    // will be shown on error page
     console.log('error', err)
   }
 }
 
 const login = async (req, res) => {
   try {
-    if(req.errors){
-      return res.render('login',{ errorMessage: req.errors })
+    if (req.errors) {
+      return res.render('login', { errorMessage: req.errors })
     }
 
     const { email, password } = req.body
@@ -42,10 +54,10 @@ const login = async (req, res) => {
 
     // seesion will go here
 
-    // After login user redirect to shop page 
+    // After login user redirect to shop page
     res.redirect('/user/test')
   } catch (err) {
-    // will be shown on error page 
+    // will be shown on error page
     console.log('error', err)
   }
 }
