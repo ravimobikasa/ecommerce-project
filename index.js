@@ -8,6 +8,7 @@ const db = require('./config/db')
 const userRoutes = require('./routes/userRoutes')
 const orderRoutes = require('./routes/orderRoutes')
 
+const productRoutes = require('./routes/productRoutes')
 dotenv.config()
 
 app.use(
@@ -32,12 +33,6 @@ app.use(express.urlencoded())
 
 app.use('/user', userRoutes)
 app.use('/order', orderRoutes)
-
-/*
-db.sync()
-  .then((result) => console.log('sync success'))
-  .catch((err) => console.log('sync error ', err.message))
-*/
 
 db.sync()
   .then((result) => console.log('sync success'))
