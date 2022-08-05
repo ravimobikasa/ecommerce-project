@@ -1,11 +1,12 @@
 const { hashPassword } = require('./../utils')
 const { User } = require('./../models')
-const { render } = require('ejs')
+
+
 
 const registerUser = async (req, res) => {
   try {
-    if(req.errors){
-      return res.render('register',{ errorMessage: req.errors })
+    if (req.errors) {
+      return res.render('register', { errorMessage: req.errors })
     }
     const { firstName, lastName, email, phoneNumber, password } = req.body
 
@@ -21,15 +22,15 @@ const registerUser = async (req, res) => {
 
     res.redirect('/user/login')
   } catch (err) {
-    // will be shown on error page 
+    // will be shown on error page
     console.log('error', err)
   }
 }
 
 const login = async (req, res) => {
   try {
-    if(req.errors){
-      return res.render('login',{ errorMessage: req.errors })
+    if (req.errors) {
+      return res.render('login', { errorMessage: req.errors })
     }
 
     const { email, password } = req.body
@@ -40,17 +41,26 @@ const login = async (req, res) => {
       return res.render('login', { errorMessage: 'Please enter correct email or password' })
     }
 
-    // seesion will go here
+    // session will go here
 
-    // After login user redirect to shop page 
-    res.redirect('/user/test')
+    req.session.user = {
+      id: user.id,
+    }
+    // After login user redirect to shop page
+    res.send('Your Are now logged in')
   } catch (err) {
-    // will be shown on error page 
+    // will be shown on error page
     console.log('error', err)
   }
+}
+
+const logOut = (req, res) => {
+  req.session.destroy()
+  res.send('You are logout')
 }
 
 module.exports = {
   registerUser,
   login,
+  logOut,
 }

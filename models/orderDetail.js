@@ -3,14 +3,7 @@
 const { DataTypes, Model } = require('sequelize')
 const sequelize = require('../config/db')
 
-class OrderDetail extends Model {
-
-  static associate(models) {
-    const { User } = models
-    OrderDetail.belongsTo(User)
-  }
-  
-}
+class OrderDetail extends Model {}
 
 OrderDetail.init(
   {
