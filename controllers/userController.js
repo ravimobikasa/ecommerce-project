@@ -1,8 +1,6 @@
 const { hashPassword } = require('./../utils')
 const { User } = require('./../models')
 
-
-
 const registerUser = async (req, res) => {
   try {
     if (req.errors) {
@@ -47,7 +45,7 @@ const login = async (req, res) => {
       id: user.id,
     }
     // After login user redirect to shop page
-    res.send('Your Are now logged in')
+    res.redirect('/products')
   } catch (err) {
     // will be shown on error page
     console.log('error', err)

@@ -2,10 +2,12 @@ body {
     font-family: 'Roboto', sans-serif !important;
 }
 
-.product img{
-    height: 250px;
-    padding: 10px;
+.product .card img{
+    height: 200px !important;
+    object-fit: cover !important;;
 }
+
+
 
 .product .product-title{
     color: black;
@@ -17,5 +19,5 @@ body {
 
 .product .price{
     color: black;
-        font-weight: 600;
+    font-weight: 600;
 }

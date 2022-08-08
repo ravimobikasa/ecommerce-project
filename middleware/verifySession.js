@@ -5,7 +5,7 @@ const verifySession = (req, res, next) => {
     return res.redirect('/user/login')
   }
 
-  req.body.user = req.session.user
+  req.user = req.session.user
 
   next()
 }

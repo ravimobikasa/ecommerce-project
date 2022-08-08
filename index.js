@@ -4,11 +4,15 @@ const dotenv = require('dotenv')
 const session = require('express-session')
 const SequelizeStore = require('connect-session-sequelize')(session.Store)
 const db = require('./config/db')
+const path = require('path')
 
 const userRoutes = require('./routes/userRoutes')
 const orderRoutes = require('./routes/orderRoutes')
 
 const productRoutes = require('./routes/productRoutes')
+const cartRoutes = require('./routes/cartRoutes')
+const verifySession = require('./middleware/verifySession')
+
 dotenv.config()
 
 app.use(
@@ -28,11 +32,14 @@ app.set('view engine', 'ejs')
 
 app.use(express.json())
 app.use(express.urlencoded())
+app.use(express.static(path.join(__dirname, 'public')))
 
 // Routes
 
 app.use('/user', userRoutes)
-app.use('/order', orderRoutes)
+app.use(verifySession, productRoutes)
+app.use('/order', verifySession, orderRoutes)
+app.use('/cart', verifySession, cartRoutes)
 
 db.sync()
   .then((result) => console.log('sync success'))
