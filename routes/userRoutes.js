@@ -3,7 +3,6 @@ const router = express.Router()
 const validate = require('./../middleware/validate')
 const userValidation = require('./../validations/userValidation')
 const userController = require('./../controllers/userController')
-const verifySession = require('./../middleware/verifySession')
 
 //Register routes
 router.get('/register', userController.registerPage)

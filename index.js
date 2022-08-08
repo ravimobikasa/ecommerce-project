@@ -37,7 +37,7 @@ app.use(express.static(path.join(__dirname, 'public')))
 
 // Routes
 app.use('/', userRoutes)
-app.use('product', productRoutes)
+app.use('/product', productRoutes)
 app.use('/order', orderRoutes)
 app.use('/cart', cartRoutes)
 

@@ -23,7 +23,7 @@
         <% } %>
 
         <% const formData = locals.formData %>
-        <form action="/user/login" method="post">
+        <form action="/login" method="post">
           <div class="mb-3">
             <label  class="form-label">Email address</label>
             <input type="email" class="form-control" placeholder="example@gmail.com" name="email" value="<%= formData?.email %>" required>
@@ -35,7 +35,7 @@
           <button type="submit" class="btn btn-primary">Login</button>
           <p >
             <label  class="form-label">Don't have an account ?</label>
-            <a class="btn btn-primary" href="/user/register">Register User</a>
+            <a class="btn btn-primary" href="/register">Register User</a>
           </p>
         </form>
       </div>

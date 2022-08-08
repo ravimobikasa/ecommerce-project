@@ -21,22 +21,23 @@
         <% if(typeof errorMessage != 'undefined' && errorMessage) { %>
           <p class="errorMessage"><%- errorMessage %></p>
         <% } %>
-        <form action="/user/register" method="post">
+        <% const formData = locals.formData %>
+        <form action="/register" method="post">
             <div class="mb-3">
                 <label  class="form-label">First Name</label>
-                <input type="text" class="form-control" placeholder="example" name="firstName" required>
+                <input type="text" class="form-control" placeholder="example" name="firstName" value="<%= formData?.firstName %>" required>
             </div>
             <div class="mb-3">
                 <label  class="form-label">Last Name</label>
-                <input type="text" class="form-control" placeholder="example" name="lastName" >
+                <input type="text" class="form-control" placeholder="example" name="lastName" value="<%= formData?.lastName %>" required>
             </div>
           <div class="mb-3">
             <label  class="form-label">Email address</label>
-            <input type="email" class="form-control" placeholder="example@gmail.com" name="email" required>
+            <input type="email" class="form-control" placeholder="example@gmail.com" name="email" value="<%= formData?.email %>" required>
           </div>
           <div class="mb-3">
             <label  class="form-label">Phone Number</label>
-            <input type="number" class="form-control" placeholder="1234567890" name="phoneNumber" required>
+            <input type="number" class="form-control" placeholder="1234567890" name="phoneNumber" value="<%= formData?.phoneNumber %>" required>
           </div>
           <div class="mb-3">
             <label  class="form-label">Password</label>
@@ -46,7 +47,7 @@
          
           <p >
             <label  class="form-label">Already have an account ?</label>
-            <a  class="btn btn-primary" href="/user/login">Login User</a>
+            <a  class="btn btn-primary" href="/login">Login User</a>
           </p>
         </form>
       </div>
