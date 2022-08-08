@@ -1,12 +1,13 @@
 const Joi = require('joi')
+const { password, phoneNumber } = require('./customValidation')
 
 const registerUser = {
   body: Joi.object().keys({
     firstName: Joi.string().required(),
     lastName: Joi.string(),
     email: Joi.string().required().email(),
-    password: Joi.string().required(),
-    phoneNumber: Joi.string().required(),
+    phoneNumber: Joi.string().required().custom(phoneNumber),
+    password: Joi.string().required().custom(password),
   }),
 }
 

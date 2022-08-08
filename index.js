@@ -9,6 +9,7 @@ const userRoutes = require('./routes/userRoutes')
 const orderRoutes = require('./routes/orderRoutes')
 
 const productRoutes = require('./routes/productRoutes')
+const cartRoutes = require('./routes/cartRoutes')
 dotenv.config()
 
 app.use(
@@ -32,6 +33,8 @@ app.use(express.urlencoded())
 // Routes
 
 app.use('/user', userRoutes)
+app.use('/product', productRoutes)
+app.use('/cart', cartRoutes)
 app.use('/order', orderRoutes)
 
 db.sync()

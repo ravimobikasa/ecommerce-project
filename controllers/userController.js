@@ -1,14 +1,24 @@
 const { hashPassword } = require('./../utils')
 const { User } = require('./../models')
 
-
-
 const registerUser = async (req, res) => {
   try {
     if (req.errors) {
       return res.render('register', { errorMessage: req.errors })
     }
     const { firstName, lastName, email, phoneNumber, password } = req.body
+
+    const user = await User.findOne({ where: { email } })
+
+    if (user) {
+      return res.render('register', { errorMessage: 'Email already exist' })
+    }
+
+    const result = await User.findOne({ where: { phoneNumber } })
+
+    if (result) {
+      return res.render('register', { errorMessage: 'Phone Number already exist' })
+    }
 
     const hashedPassword = await hashPassword.generateHash(password, 10)
 
