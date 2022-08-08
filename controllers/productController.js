@@ -25,7 +25,7 @@ const addProduct = async (req, res) => {
       descrption: description,
     })
 
-    res.redirect('/product/products')
+    res.redirect('/products')
   } catch (err) {
     res.json(err)
   }

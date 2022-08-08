@@ -17,7 +17,14 @@ const phoneNumber = (value, helpers) => {
   return value
 }
 
+const priceValidate = (value, helpers) => {
+  if (value <= 0) {
+    return helpers.message('Price should be greater tha 0')
+  }
+  return value
+}
 module.exports = {
   password,
   phoneNumber,
+  priceValidate,
 }
