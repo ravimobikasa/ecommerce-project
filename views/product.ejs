@@ -26,10 +26,6 @@
   </head>
 
   <body>
-    <div class="container p-5">
-        <% if(typeof errorMessage != 'undefined' && errorMessage) { %>
-          <p class="errorMessage"><%- errorMessage %></p>
-        <% } %>
     <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
       <div class="container-fluid px-5">
         <a class="navbar-brand" href="#">Ecommerce Store</a>
@@ -69,31 +65,23 @@
 
     <main>
       <div class="container-fluid px-5 pt-3">
+        <% if(typeof errorMessage != 'undefined' && errorMessage) { %>
+        <p class="errorMessage"><%- errorMessage %></p>
+        <% } %>
         <div class="heading">
-          <h2>Products</h2>
+          <h2>Product</h2>
         </div>
         <div class="row mt-4">
-          <% if(products.length){ for(var i = 0; i< products.length; i++) { %>
           <div class="col">
             <div class="card">
-              <img class="card-img-top" src="/images/products/<%=products[i].imageUrl %>" alt="Card image" />
+              <img class="card-img-top" src="/images/products/<%=product.imageUrl %>" alt="Card image" />
               <div class="card-body">
-                <h4 class="card-title"><%= products[i].title %></h4>
-
-                <p class="card-text">₹ <%= products[i].price %></p>
-
-                <p>
-                  <label class="form-label"></label>
-                  <a class="btn btn-primary" href="/product/product/<%=products[i].id %>">Product details</a>
-                </p>
-                <p>
-                  <label class="form-label"></label>
-                  <a class="btn btn-primary" href="/product/product/<%=products[i].id %>">Add to cart</a>
-                </p>
+                <h4 class="card-title"><%= product.title %></h4>
+                <p class="card-text"><%= product.descrption %></p>
+                <p class="card-text">₹ <%= product.price %></p>
               </div>
             </div>
           </div>
-          <%}}%>
         </div>
       </div>
     </main>

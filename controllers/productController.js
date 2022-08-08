@@ -1,12 +1,21 @@
 const { RESET_CONTENT } = require('http-status-codes')
 const { Products } = require('../models')
-
+const { Op } = require('sequelize')
 const addProduct = async (req, res) => {
   try {
-    req.body.imageUrl = req.file.filename
-    const { title, price, description, imageUrl } = req.body
     if (req.errors) {
-      return res.json(req.errors)
+      return res.render('addProducts', { errorMessage: req.errors })
+    }
+    if (req.file == undefined) {
+      return res.render('addProducts', { errorMessage: 'Please add a file' })
+    }
+    req.body.imageUrl = req.file.filename
+    console.log(req)
+
+    const { title, price, description, imageUrl } = req.body
+
+    if (!title || !price || !description) {
+      res.json('Please enter all fields')
     }
 
     const result = await Products.create({
@@ -15,14 +24,17 @@ const addProduct = async (req, res) => {
       price,
       descrption: description,
     })
-    //res.json(result)
-    res.redirect('/product/product')
+
+    res.redirect('/product/products')
   } catch (err) {
     res.json(err)
   }
 }
 const allProducts = async (req, res) => {
   try {
+    if (req.errors) {
+      return res.render('products', { errorMessage: req.errors })
+    }
     const { limit, offset } = req.query
 
     let query = {
@@ -38,19 +50,25 @@ const allProducts = async (req, res) => {
 }
 const getProduct = async (req, res) => {
   try {
+    if (req.errors) {
+      return res.render('product', { errorMessage: req.errors })
+    }
+
     const id = req.params.id
     const query = {
       where: {
         id,
       },
     }
-    const result = await Products.findOne(query)
-    if (result == null) {
+    const product = await Products.findOne(query)
+    if (product == null) {
       return res.json('Product does not exist')
     }
-    res.json(result)
+    //console.log(product)
+    res.render('product', { product: product })
+    //res.json(product)
   } catch (err) {
-    res.jon(err)
+    res.json(err)
   }
 }
 
@@ -73,9 +91,33 @@ const updateProduct = async (req, res) => {
     res.json(err)
   }
 }
+
+const searchProduct = async (req, res) => {
+  try {
+    const { search } = req.query
+    console.log(search)
+    const result = await Products.findAll({
+      where: {
+        [Op.or]: {
+          title: {
+            [Op.substring]: `${search}`,
+          },
+          descrption: {
+            [Op.substring]: `${search}`,
+          },
+        },
+      },
+    })
+    console.log(result)
+    res.json(result)
+  } catch (err) {
+    res.json(err)
+  }
+}
 module.exports = {
   addProduct,
   allProducts,
   getProduct,
   updateProduct,
+  searchProduct,
 }
