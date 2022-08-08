@@ -57,7 +57,7 @@ const login = async (req, res) => {
       id: user.id,
     }
     // After login user redirect to shop page
-    res.send('Your Are now logged in')
+    res.redirect('/products')
   } catch (err) {
     // will be shown on error page
     console.log('error', err)
@@ -66,7 +66,7 @@ const login = async (req, res) => {
 
 const logOut = (req, res) => {
   req.session.destroy()
-  res.send('You are logout')
+  res.redirect('/user/login')
 }
 
 module.exports = {

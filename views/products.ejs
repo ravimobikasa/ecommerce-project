@@ -1,0 +1,58 @@
+<%- include('partials/header.ejs') %>
+
+
+    <section>
+        <div class="container pt-3">
+            <div class="heading ">
+                <h2>Products</h2>
+            </div>
+
+            <div class="row mt-4">
+
+                <% products?.forEach( item=> { %>
+
+                    <div class="col-lg-3 mt-3">
+
+                        <div class="product">
+                            <div class="card r-5 shadow-sm">
+
+                                <img class=" card-img-top p-1 img-fluid img-thumbnail  "
+                                    src=" /../images/products/<%=item.imageUrl%>" alt="Card image">
+
+                                <div class="card-body">
+                                    <h5 class="product-title ">
+                                        <%= item.title %>
+                                    </h5>
+                                    <p class="product-desc">
+                                        <%= item.descrption %>
+                                    </p>
+
+
+                                    <div class="row">
+
+                                        <div class="col">
+                                            <h5 class="price">
+                                                $<%= item.price %>
+                                            </h5>
+                                        </div>
+                                        <div class=" col d-flex justify-content-end">
+                                            <form method="post" action="/cart">
+                                                <input type="hidden" name="productId" value="<%=item.id%>" />
+                                                <button type="submit" class="btn btn-primary btn-sm ">Add
+                                                    to cart</a>
+                                            </form>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <% }) %>
+
+            </div>
+    </section>
+
+    <%- include('partials/footer.ejs') %>

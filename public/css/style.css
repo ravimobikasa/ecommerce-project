@@ -1,0 +1,23 @@
+body {
+    font-family: 'Roboto', sans-serif !important;
+}
+
+.product .card img{
+    height: 200px !important;
+    object-fit: cover !important;;
+}
+
+
+
+.product .product-title{
+    color: black;
+    font-weight: 600;
+}
+.product .product-desc{
+    font-size: 15px;
+}
+
+.product .price{
+    color: black;
+    font-weight: 600;
+}

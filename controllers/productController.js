@@ -25,8 +25,8 @@ const allProducts = async (req, res) => {
       offset: parseInt(offset) || 0,
       order: [['createdAt', 'DESC']],
     }
-    const result = await await Products.findAll(query)
-    res.json(result)
+    const result = await Products.findAll()
+    res.render('products', { products: result })
   } catch (err) {
     res.json(err)
   }
