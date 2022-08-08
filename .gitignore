@@ -108,3 +108,5 @@ dist
 .idea
 # vscode file removed
 .vscode
+
+public/
