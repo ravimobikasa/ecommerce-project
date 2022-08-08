@@ -20,7 +20,15 @@ const getCartProducts = async (req, res) => {
   const { id: userId } = req.user
   const products = await Cart.findAll({ where: { userId }, include: [Products] })
 
-  res.render('cart', { products: products })
+  let totalItem = 0
+  let totalPrice = 0
+
+  products.forEach((item) => {
+    totalItem += item.quantity
+    totalPrice += item.Product.price * item.quantity
+  })
+
+  res.render('cart', { products: products, totalItem, totalPrice })
 }
 
 const deleteCartItem = async (req, res) => {
@@ -36,11 +44,13 @@ const deleteCartItem = async (req, res) => {
       })
     }
 
-    const newCart = await cart.decrement('quantity')
+    if (cart.quantity === 1) {
+      await cart.destroy()
+    } else {
+      const newCart = await cart.decrement('quantity')
+    }
 
-    return res.json({
-      cart: newCart,
-    })
+    return res.redirect('/cart')
   } catch (err) {
     console.log('Error Logs')
     console.log(err)

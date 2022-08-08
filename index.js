@@ -5,7 +5,7 @@ const session = require('express-session')
 const SequelizeStore = require('connect-session-sequelize')(session.Store)
 const db = require('./config/db')
 const path = require('path')
-
+const methodOverride = require('method-override')
 const userRoutes = require('./routes/userRoutes')
 const orderRoutes = require('./routes/orderRoutes')
 
@@ -33,6 +33,15 @@ app.set('view engine', 'ejs')
 app.use(express.json())
 app.use(express.urlencoded())
 app.use(express.static(path.join(__dirname, 'public')))
+app.use(
+  methodOverride(function (req, res) {
+    if (req.body && typeof req.body === 'object' && '_method' in req.body) {
+      const method = req.body._method
+      delete req.body._method
+      return method
+    }
+  })
+)
 
 // Routes
 
