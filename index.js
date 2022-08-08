@@ -1,17 +1,17 @@
 const express = require('express')
 const app = express()
 const dotenv = require('dotenv')
+const path = require('path')
 const session = require('express-session')
 const SequelizeStore = require('connect-session-sequelize')(session.Store)
 const db = require('./config/db')
-const path = require('path')
 const methodOverride = require('method-override')
+
 const userRoutes = require('./routes/userRoutes')
 const orderRoutes = require('./routes/orderRoutes')
 
 const productRoutes = require('./routes/productRoutes')
 const cartRoutes = require('./routes/cartRoutes')
-const verifySession = require('./middleware/verifySession')
 
 dotenv.config()
 
@@ -43,12 +43,13 @@ app.use(
   })
 )
 
-// Routes
+app.use(express.static(path.join(__dirname, 'public')))
 
-app.use('/user', userRoutes)
-app.use(verifySession, productRoutes)
-app.use('/order', verifySession, orderRoutes)
-app.use('/cart', verifySession, cartRoutes)
+// Routes
+app.use('/', userRoutes)
+app.use('/product', productRoutes)
+app.use('/order', orderRoutes)
+app.use('/cart', cartRoutes)
 
 db.sync()
   .then((result) => console.log('sync success'))
