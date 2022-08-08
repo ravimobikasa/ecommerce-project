@@ -1,10 +1,10 @@
 const express = require('express')
 const app = express()
 const dotenv = require('dotenv')
+const path = require('path')
 const session = require('express-session')
 const SequelizeStore = require('connect-session-sequelize')(session.Store)
 const db = require('./config/db')
-const path = require('path')
 
 const userRoutes = require('./routes/userRoutes')
 const orderRoutes = require('./routes/orderRoutes')
@@ -31,6 +31,8 @@ app.set('view engine', 'ejs')
 
 app.use(express.json())
 app.use(express.urlencoded())
+app.use(express.static(path.join(__dirname, 'public')))
+
 app.use(express.static(path.join(__dirname, 'public')))
 
 // Routes
