@@ -5,22 +5,15 @@ const userValidation = require('./../validations/userValidation')
 const userController = require('./../controllers/userController')
 const verifySession = require('./../middleware/verifySession')
 
-router.route('/register').get((req, res) => {
-  res.render('register')
-})
+//Register routes
+router.get('/register', userController.registerPage)
+router.post('/register', validate(userValidation.registerUser), userController.registerUser)
 
-router.route('/register').post(validate(userValidation.registerUser), userController.registerUser)
+// Login routes
+router.get('/login', userController.loginPage)
+router.post('/login', validate(userValidation.login), userController.login)
 
-router.route('/login').get((req, res) => {
-  res.render('login')
-})
-
-router.route('/login').post(validate(userValidation.login), userController.login)
-
-router.route('/logout').all(userController.logOut)
-
-router.route('/test').get((req, res) => {
-  res.render('test')
-})
+// Logout route
+router.all('/logout', userController.logOut)
 
 module.exports = router

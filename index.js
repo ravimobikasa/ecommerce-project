@@ -11,7 +11,6 @@ const orderRoutes = require('./routes/orderRoutes')
 
 const productRoutes = require('./routes/productRoutes')
 const cartRoutes = require('./routes/cartRoutes')
-const verifySession = require('./middleware/verifySession')
 
 dotenv.config()
 
@@ -35,11 +34,10 @@ app.use(express.urlencoded())
 app.use(express.static(path.join(__dirname, 'public')))
 
 // Routes
-
-app.use('/user', userRoutes)
-app.use(verifySession, productRoutes)
-app.use('/order', verifySession, orderRoutes)
-app.use('/cart', verifySession, cartRoutes)
+app.use('/', userRoutes)
+app.use('product', productRoutes)
+app.use('/order', orderRoutes)
+app.use('/cart', cartRoutes)
 
 db.sync()
   .then((result) => console.log('sync success'))

@@ -21,10 +21,12 @@
         <% if(typeof errorMessage != 'undefined' && errorMessage) { %>
           <p class="errorMessage"><%- errorMessage %></p>
         <% } %>
+
+        <% const formData = locals.formData %>
         <form action="/user/login" method="post">
           <div class="mb-3">
             <label  class="form-label">Email address</label>
-            <input type="email" class="form-control" placeholder="example@gmail.com" name="email" required>
+            <input type="email" class="form-control" placeholder="example@gmail.com" name="email" value="<%= formData?.email %>" required>
           </div>
           <div class="mb-3">
             <label  class="form-label">Password</label>

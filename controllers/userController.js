@@ -48,7 +48,7 @@ const login = async (req, res) => {
     const user = await User.findOne({ where: { email } })
 
     if (!user || !(await hashPassword.comparePassword(password, user.password))) {
-      return res.render('login', { errorMessage: 'Please enter correct email or password' })
+      return res.render('login', { formData: req.body, errorMessage: 'Please enter correct email or password' })
     }
 
     // session will go here
@@ -69,8 +69,18 @@ const logOut = (req, res) => {
   res.redirect('/user/login')
 }
 
+const loginPage = (req, res) => {
+  res.render('login')
+}
+
+const registerPage = (req, res) => {
+  res.render('register')
+}
+
 module.exports = {
   registerUser,
   login,
   logOut,
+  loginPage,
+  registerPage,
 }
