@@ -24,10 +24,10 @@ router.post(
 )
 
 // Get product Detail
-router.get('/:id', productController.getProduct)
+router.get('/:id', validate(productValidation.getProduct), productController.getProduct)
 
 // update product
-router.patch('/:id', productController.updateProduct)
+router.patch('/:id', validate(productValidation.updateProduct), productController.updateProduct)
 
 //Search Api
 router.get('/search', productController.searchProduct)

@@ -53,9 +53,9 @@ app.use('/cart', cartRoutes)
 
 // Redirecting user to product page.
 
-app.use('/', (req, res, next) => {
-  res.redirect('/product')
-})
+// app.use('/', (req, res, next) => {
+//   res.redirect('/product')
+// })
 
 app.use(routeNotFound)
 

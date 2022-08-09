@@ -11,9 +11,14 @@
 
   <body>
     <div class="d-flex flex-column align-items-center justify-content-center vh-100 bg-primary">
-        <h1 class="display-1 fw-bold text-white">404 Not Found </h1>
-        <p class="display-5 fw-bold text-white">Sorry, an error has occured, Requested page not found!</p>
+        <h1 class="display-1 fw-bold text-white">404</h1>
         <p >
+          <% if(typeof errorMessage != 'undefined' && errorMessage) { %>
+            <p class="errorMessage display-5 fw-bold text-white"><%- errorMessage %></p>
+          <% } else{%>
+            <p class="display-5 fw-bold text-white">Unfortunately the page you are looking for has been moved or deleted!</p>
+            <%}
+          %>
           <label  class="form-label">Go To Home Page ?</label>
           <a  class="btn btn-primary" href="/product"> Home</a>
         </p>

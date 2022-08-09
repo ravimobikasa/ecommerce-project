@@ -51,7 +51,7 @@ const allProducts = async (req, res) => {
 const getProduct = async (req, res) => {
   try {
     if (req.errors) {
-      return res.render('product', { errorMessage: req.errors })
+      return res.render('404error', { errorMessage: req.errors })
     }
 
     const id = req.params.id
@@ -61,14 +61,14 @@ const getProduct = async (req, res) => {
       },
     }
     const product = await Products.findOne(query)
-    if (product == null) {
-      return res.json('Product does not exist')
+    if (!product) {
+      return res.render('404error', { errorMessage: 'Product Not Found .....!' })
     }
     //console.log(product)
     res.render('product', { product: product })
     //res.json(product)
   } catch (err) {
-    res.json(err)
+    console, log('producterror', err)
   }
 }
 
