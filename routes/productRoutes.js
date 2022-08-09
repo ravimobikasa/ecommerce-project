@@ -27,6 +27,7 @@ router.post(
 router.get('/:id', validate(productValidation.getProduct), productController.getProduct)
 
 // update product
+router.get('/updateProduct/:id', productController.updateProductPage)
 router.patch('/:id', validate(productValidation.updateProduct), productController.updateProduct)
 
 //delete a product
