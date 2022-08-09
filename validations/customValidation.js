@@ -11,13 +11,19 @@ const password = (value, helpers) => {
 
 const phoneNumber = (value, helpers) => {
   if (value.length != 10) {
-    console.log('value', value.length)
     return helpers.message('Phone Number must be at least 10 digits')
   }
   return value
 }
 
+const priceValidate = (value, helpers) => {
+  if (value <= 0) {
+    return helpers.message('Price should be greater tha 0')
+  }
+  return value
+}
 module.exports = {
   password,
   phoneNumber,
+  priceValidate,
 }

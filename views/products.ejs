@@ -10,15 +10,15 @@
             <div class="row mt-4">
 
                 <% products?.forEach( item=> { %>
-
+                   
                     <div class="col-lg-3 mt-3">
-
+                        
                         <div class="product">
                             <div class="card r-5 shadow-sm">
-
+                                <a href="/product/<%=item.id%>">
                                 <img class=" card-img-top p-1 img-fluid img-thumbnail  "
                                     src=" /../images/products/<%=item.imageUrl%>" alt="Card image">
-
+                                </a>
                                 <div class="card-body">
                                     <h5 class="product-title ">
                                         <%= item.title %>
@@ -48,7 +48,9 @@
 
                             </div>
                         </div>
+                   
                     </div>
+                
 
                     <% }) %>
 

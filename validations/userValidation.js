@@ -17,8 +17,17 @@ const login = {
     password: Joi.string().required(),
   }),
 }
+const addProduct = {
+  body: Joi.object().keys({
+    title: Joi.string().required(),
+    imageUrl: Joi.string().required(),
+    price: Joi.number().required(),
+    description: Joi.string().required(),
+  }),
+}
 
 module.exports = {
   registerUser,
   login,
+  addProduct,
 }
