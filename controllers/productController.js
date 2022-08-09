@@ -25,7 +25,7 @@ const addProduct = async (req, res) => {
       descrption: description,
     })
 
-    res.redirect('/products')
+    res.redirect('/product')
   } catch (err) {
     res.json(err)
   }
@@ -114,10 +114,16 @@ const searchProduct = async (req, res) => {
     res.json(err)
   }
 }
+
+const getAddProductPage = (req, res) => {
+  res.render('addproducts')
+}
+
 module.exports = {
   addProduct,
   allProducts,
   getProduct,
   updateProduct,
   searchProduct,
+  getAddProductPage,
 }

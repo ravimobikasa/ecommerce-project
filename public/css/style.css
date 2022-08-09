@@ -4,10 +4,8 @@ body {
 
 .product .card img{
     height: 200px !important;
-    object-fit: cover !important;;
+    object-fit: contain !important;;
 }
-
-
 
 .product .product-title{
     color: black;
@@ -20,4 +18,8 @@ body {
 .product .price{
     color: black;
     font-weight: 600;
+}
+.cart img{
+    height: 100px !important;
+    object-fit: contain !important;
 }

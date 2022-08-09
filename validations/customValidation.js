@@ -11,7 +11,6 @@ const password = (value, helpers) => {
 
 const phoneNumber = (value, helpers) => {
   if (value.length != 10) {
-    console.log('value', value.length)
     return helpers.message('Phone Number must be at least 10 digits')
   }
   return value

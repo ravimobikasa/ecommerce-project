@@ -18,7 +18,8 @@ function checkFileType(file, cb) {
   if (mimetype && extname) {
     return cb(null, true)
   } else {
-    cb('Error: Images Only!')
+    req.error = 'Error: Images Only!'
+    cb(null, true)
   }
 }
 
@@ -27,7 +28,7 @@ const upload = multer({
 
   limits: { fileSize: 1000000 },
   fileFilter: function (req, file, cb) {
-    checkFileType(file, cb)
+    checkFileType(req, file, cb)
   },
 })
 // .single('myImage')

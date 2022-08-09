@@ -4,22 +4,32 @@ const validate = require('./../middleware/validate')
 const productValidation = require('./../validations/productValidation')
 const productController = require('../controllers/productController')
 const multer = require('../utils/multer')
+const verifySession = require('./../middleware/verifySession')
 const multerWrapper = require('../middleware/multerWrapper')
+// Protected to login user only
+router.use(verifySession)
 
-router.route('/product').post(multerWrapper(multer.upload.single('myImage')), productController.addProduct)
-router.route('/products').get(productController.allProducts)
-router.route('/product/:id').get(productController.getProduct).put(productController.updateProduct)
+// Get All product
+router.get('/', productController.allProducts)
+
+//Add product Page
+router.get('/addProduct', productController.getAddProductPage)
+
+// Post Add product
+router.post(
+  '/',
+  multerWrapper(multer.upload.single('myImage')),
+  validate(productValidation.addProduct),
+  productController.addProduct
+)
+
+// Get product Detail
+router.get('/:id', productController.getProduct)
+
+// update product
+router.patch('/:id', productController.updateProduct)
+
+//Search Api
 router.get('/search', productController.searchProduct)
-router.route('/products').get((req, res) => {
-  res.render('products')
-})
-
-router.route('/addProduct').get((req, res) => {
-  res.render('addproducts')
-})
-
-router.route('/product').get((req, res) => {
-  res.render('product')
-})
 
 module.exports = router
