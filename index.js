@@ -51,6 +51,12 @@ app.use('/product', productRoutes)
 app.use('/order', orderRoutes)
 app.use('/cart', cartRoutes)
 
+// Redirecting user to product page.
+
+app.use('/', (req, res, next) => {
+  res.redirect('/product')
+})
+
 app.use(routeNotFound)
 
 db.sync()
