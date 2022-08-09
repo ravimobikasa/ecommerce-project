@@ -12,7 +12,6 @@ const addProduct = async (req, res) => {
       return res.render('addProducts', { errorMessage: 'Please add a file' })
     }
     req.body.imageUrl = req.file.filename
-    console.log(req)
 
     const { title, price, description, imageUrl } = req.body
 
@@ -70,24 +69,32 @@ const getProduct = async (req, res) => {
     res.render('product', { product: product })
     //res.json(product)
   } catch (err) {
-    console, log('producterror', err)
+    console.log('producterror', err)
   }
 }
 
 const updateProduct = async (req, res) => {
   try {
-    const { title, price, description } = req.body
-
     const id = req.params.id
+    if (!req.file) {
+      imageUrl = undefined
+    }
+    if (req.file) {
+      imageUrl = req.file.filename
+      // const filepath = './public/images/products/' + product.imageUrl
+      // const deleteResult = await deleteImage(filepath)
+    }
+
+    const { title, price, description } = req.body
 
     let query = {
       title,
-      imageUrl: req.file.filename,
+      imageUrl,
       price,
       descrption: description,
     }
-    const result = await Products.update(query, { where: id })
-
+    console.log(query)
+    const result = await Products.update(query, { where: { id } })
     res.json(result)
   } catch (err) {
     res.json(err)
@@ -117,23 +124,25 @@ const searchProduct = async (req, res) => {
   }
 }
 const deleteProduct = async (req, res) => {
-  const id = req.params.id
+  try {
+    const id = req.params.id
 
-  const product = await Products.findOne({
-    where: { id },
-  })
-  if (!product) {
-    return res.json('product does not exists')
-  }
-  const filepath = './public/images/products/' + product.imageUrl
-  const result = await Products.destroy({
-    where: {
-      id,
-    },
-  })
+    const product = await Products.findOne({
+      where: { id },
+    })
+    if (!product) {
+      return res.json('product does not exists')
+    }
+    const filepath = './public/images/products/' + product.imageUrl
+    const result = await Products.destroy({
+      where: {
+        id,
+      },
+    })
 
-  const deleteResult = await deleteImage(filepath)
-  return res.redirect('/product')
+    const deleteResult = await deleteImage(filepath)
+    return res.redirect('/product')
+  } catch (err) {}
 }
 
 const getAddProductPage = (req, res) => {
