@@ -1,6 +1,8 @@
 const { RESET_CONTENT } = require('http-status-codes')
 const { Products } = require('../models')
 const { Op } = require('sequelize')
+const fsPromises = require('fs/promises')
+const deleteImage = require('../utils/deleteImage')
 const addProduct = async (req, res) => {
   try {
     if (req.errors) {
@@ -114,6 +116,25 @@ const searchProduct = async (req, res) => {
     res.json(err)
   }
 }
+const deleteProduct = async (req, res) => {
+  const id = req.params.id
+
+  const product = await Products.findOne({
+    where: { id },
+  })
+  if (!product) {
+    return res.json('product does not exists')
+  }
+  const filepath = './public/images/products/' + product.imageUrl
+  const result = await Products.destroy({
+    where: {
+      id,
+    },
+  })
+
+  const deleteResult = await deleteImage(filepath)
+  return res.redirect('/product')
+}
 
 const getAddProductPage = (req, res) => {
   res.render('addproducts')
@@ -126,4 +147,5 @@ module.exports = {
   updateProduct,
   searchProduct,
   getAddProductPage,
+  deleteProduct,
 }

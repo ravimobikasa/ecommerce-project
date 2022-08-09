@@ -29,6 +29,9 @@ router.get('/:id', productController.getProduct)
 // update product
 router.patch('/:id', productController.updateProduct)
 
+//delete a product
+router.delete('/:id', productController.deleteProduct)
+
 //Search Api
 router.get('/search', productController.searchProduct)
 
