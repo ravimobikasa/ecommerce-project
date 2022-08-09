@@ -4,10 +4,9 @@ const validate = require('./../middleware/validate')
 const productValidation = require('./../validations/productValidation')
 const productController = require('../controllers/productController')
 const multer = require('../utils/multer')
+const multerWrapper = require('../middleware/multerWrapper')
 
-router
-  .route('/product')
-  .post(multer.upload.single('myImage'), validate(productValidation.addProduct), productController.addProduct)
+router.route('/product').post(multerWrapper(multer.upload.single('myImage')), productController.addProduct)
 router.route('/products').get(productController.allProducts)
 router.route('/product/:id').get(productController.getProduct).put(productController.updateProduct)
 router.get('/search', productController.searchProduct)
