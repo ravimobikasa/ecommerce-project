@@ -59,7 +59,7 @@ app.use('/', (req, res, next) => {
 
 app.use(routeNotFound)
 
-db.sync()
+db.sync({ alter: true })
   .then((result) => console.log('sync success'))
   .catch((err) => console.log('sync error ', err.message))
 

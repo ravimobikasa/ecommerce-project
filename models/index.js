@@ -18,7 +18,7 @@ User.hasMany(Address, {
   foreignKey: 'userId',
 })
 
-User.hasOne(Cart, {
+User.hasMany(Cart, {
   foreignKey: 'userId',
 })
 
@@ -58,6 +58,7 @@ module.exports = {
   User,
   Address,
   OrderDetail,
+  OrderItem,
   Cart,
   Products,
 }

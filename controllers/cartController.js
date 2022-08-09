@@ -17,6 +17,7 @@ const addToCart = async (req, res) => {
 }
 
 const getCartProducts = async (req, res) => {
+  
   const { id: userId } = req.user
   const products = await Cart.findAll({ where: { userId }, include: [Products] })
 
