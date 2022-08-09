@@ -29,6 +29,9 @@ router.get('/:id', validate(productValidation.getProduct), productController.get
 // update product
 router.patch('/:id', validate(productValidation.updateProduct), productController.updateProduct)
 
+//delete a product
+router.delete('/:id', productController.deleteProduct)
+
 //Search Api
 router.get('/search', productController.searchProduct)
 
