@@ -149,6 +149,13 @@ const getAddProductPage = (req, res) => {
   res.render('addproducts')
 }
 
+const updateProductPage = async (req, res) => {
+  const { id } = req.params
+  const product = await Products.findOne({ where: { id } })
+  console.log('product', product)
+  res.render('updateProduct', { product: product })
+}
+
 module.exports = {
   addProduct,
   allProducts,
@@ -157,4 +164,5 @@ module.exports = {
   searchProduct,
   getAddProductPage,
   deleteProduct,
+  updateProductPage,
 }

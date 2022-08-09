@@ -1,0 +1,31 @@
+<%- include('partials/header.ejs') %><!DOCTYPE html>
+
+    <div class="backgroundColor">
+      <div class="container p-5">
+        <% if(typeof errorMessage != 'undefined' && errorMessage) { %>
+        <p class="errorMessage"><%- errorMessage %></p>
+        <% } %>
+        <form action="" method="post" enctype="multipart/form-data">
+          <div class="mb-3">
+            <label class="form-label">Product Title</label>
+            <input type="text" class="form-control" placeholder="Enter the product title" name="title" value="<%=product.title%>" required />
+          </div>
+          <div class="mb-3">
+            <label for="" class="form-label">Upload Image</label>
+            <input type="file" name="myImage" class="form-control" required />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Price</label>
+            <input type="number" class="form-control" placeholder="00" step=".01" min="1" name="price" value="<%=product.price%>" required />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Description</label>
+            <textarea class="form-control" placeholder="product details" name="descrption" value="<%=product.descrption%>" cols="60" rows="10" required ></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary">Add Product</button>
+
+        </form>
+      </div>
+    </div>
+
+<%- include('partials/footer.ejs') %>

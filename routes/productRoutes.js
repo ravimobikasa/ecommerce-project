@@ -29,6 +29,8 @@ router.get('/:id', validate(productValidation.getProduct), productController.get
 // update product
 router.patch('/:id', multerWrapper(multer.upload.single('myImage')), productController.updateProduct)
 
+router.get('/updateProduct/:id', productController.updateProductPage)
+
 //delete a product
 router.delete('/:id', productController.deleteProduct)
 
