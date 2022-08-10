@@ -2,13 +2,12 @@ const User = require('./user')
 const Address = require('./address')
 const OrderDetail = require('./orderDetail')
 const OrderItem = require('./orderItem')
-const Product = require('./products')
+const Product = require('./product')
 
 /**
  * Relationship mapping.
  * */
 const Cart = require('./cart')
-const Products = require('./products')
 
 User.hasMany(OrderDetail, {
   foreignKey: 'userId',
@@ -59,5 +58,5 @@ module.exports = {
   Address,
   OrderDetail,
   Cart,
-  Products,
+  Product,
 }

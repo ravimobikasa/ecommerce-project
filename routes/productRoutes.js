@@ -15,7 +15,7 @@ router.get('/', productController.allProducts)
 //Add product Page
 router.get('/addProduct', productController.getAddProductPage)
 
-// Post Add product
+//Add product
 router.post(
   '/',
   multerWrapper(multer.upload.single('myImage')),
@@ -27,7 +27,12 @@ router.post(
 router.get('/:id', validate(productValidation.getProduct), productController.getProduct)
 
 // update product
-router.patch('/:id', multerWrapper(multer.upload.single('myImage')), productController.updateProduct)
+router.post(
+  '/:id',
+  multerWrapper(multer.upload.single('myImage')),
+  validate(productValidation.updateProduct),
+  productController.updateProduct
+)
 
 router.get('/updateProduct/:id', productController.updateProductPage)
 
