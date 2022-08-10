@@ -1,16 +1,17 @@
 const { RESET_CONTENT } = require('http-status-codes')
-const { Products } = require('../models')
+const { Product } = require('../models')
 const { Op } = require('sequelize')
 const fsPromises = require('fs/promises')
 const deleteImage = require('../utils/deleteImage')
 const addProduct = async (req, res) => {
   try {
-    if (req.errors) {
-      return res.render('addProducts', { errorMessage: req.errors })
-    }
     if (req.file == undefined) {
-      return res.render('addProducts', { errorMessage: 'Please add a file' })
+      return res.render('addProducts', { formData: req.body, errorMessage: 'Please add a file' })
     }
+    if (req.errors) {
+      return res.render('addProducts', { formData: req.body, errorMessage: req.errors })
+    }
+
     req.body.imageUrl = req.file.filename
 
     const { title, price, description, imageUrl } = req.body
@@ -19,11 +20,11 @@ const addProduct = async (req, res) => {
       res.json('Please enter all fields')
     }
 
-    const result = await Products.create({
+    const result = await Product.create({
       title,
       imageUrl,
       price,
-      descrption: description,
+      description,
     })
 
     res.redirect('/product')
@@ -43,7 +44,7 @@ const allProducts = async (req, res) => {
       offset: parseInt(offset) || 0,
       order: [['createdAt', 'DESC']],
     }
-    const products = await Products.findAll(query)
+    const products = await Product.findAll(query)
     res.render('products', { products: products })
   } catch (err) {
     res.json(err)
@@ -61,7 +62,7 @@ const getProduct = async (req, res) => {
         id,
       },
     }
-    const product = await Products.findOne(query)
+    const product = await Product.findOne(query)
     if (!product) {
       return res.render('404error', { errorMessage: 'Product Not Found .....!' })
     }
@@ -76,12 +77,23 @@ const getProduct = async (req, res) => {
 const updateProduct = async (req, res) => {
   try {
     const id = req.params.id
+
+    if (req.errors) {
+      const product = await Product.findOne({
+        where: {
+          id,
+        },
+      })
+      return res.render('updateProduct', { errorMessage: req.errors, product: product })
+    }
+    console.log('eguygddd', req.errors)
     if (!req.file) {
       imageUrl = undefined
     }
     if (req.file) {
       imageUrl = req.file.filename
-      // const filepath = './public/images/products/' + product.imageUrl
+      console.log(req.file.filename)
+      // const filepath = './public/images/products/' + product.imageUrl || undefined
       // const deleteResult = await deleteImage(filepath)
     }
 
@@ -91,11 +103,12 @@ const updateProduct = async (req, res) => {
       title,
       imageUrl,
       price,
-      descrption: description,
+      description,
     }
     console.log(query)
-    const result = await Products.update(query, { where: { id } })
-    res.json(result)
+    const result = await Product.update(query, { where: { id } })
+    return res.redirect(`/product/${id}`)
+    //res.json(result)
   } catch (err) {
     res.json(err)
   }
@@ -105,7 +118,7 @@ const searchProduct = async (req, res) => {
   try {
     const { search } = req.query
     console.log(search)
-    const result = await Products.findAll({
+    const result = await Product.findAll({
       where: {
         [Op.or]: {
           title: {
@@ -127,14 +140,14 @@ const deleteProduct = async (req, res) => {
   try {
     const id = req.params.id
 
-    const product = await Products.findOne({
+    const product = await Product.findOne({
       where: { id },
     })
     if (!product) {
       return res.json('product does not exists')
     }
     const filepath = './public/images/products/' + product.imageUrl
-    const result = await Products.destroy({
+    const result = await Product.destroy({
       where: {
         id,
       },
@@ -151,7 +164,7 @@ const getAddProductPage = (req, res) => {
 
 const updateProductPage = async (req, res) => {
   const { id } = req.params
-  const product = await Products.findOne({ where: { id } })
+  const product = await Product.findOne({ where: { id } })
   console.log('product', product)
   res.render('updateProduct', { product: product })
 }

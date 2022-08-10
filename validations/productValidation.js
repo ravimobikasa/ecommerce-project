@@ -17,10 +17,9 @@ const getProduct = {
 
 const updateProduct = {
   body: Joi.object().keys({
-    id: Joi.number().required(),
-    title: Joi.string(),
-    price: Joi.number().custom(priceValidate),
-    description: Joi.string(),
+    title: Joi.string().required(),
+    price: Joi.number().required().custom(priceValidate),
+    description: Joi.string().required(),
   }),
 }
 
