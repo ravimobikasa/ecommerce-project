@@ -13,7 +13,11 @@ const orderRoutes = require('./routes/orderRoutes')
 const productRoutes = require('./routes/productRoutes')
 const cartRoutes = require('./routes/cartRoutes')
 const routeNotFound = require('./middleware/notFoundError')
+const orderController = require('./controllers/orderController')
 dotenv.config()
+const stripe = require('stripe')(
+  'sk_test_51LUnlrSApwaIyK3wlHrf3Guid5dTNw5TvPydH5r4mVwjkkkmlS25Uis6UCBImO3SWTuehzNdVXOClXDog22OuTPd002sqXHvdZ'
+)
 
 app.use(
   session({
@@ -28,10 +32,52 @@ app.use(
   })
 )
 
-app.set('view engine', 'ejs')
 
+app.post('/webhook', express.raw({ type: 'application/json' }), orderController.stripeWebHook)
+
+// app.post('/webhook', express.raw({ type: 'application/json' }), async (request, response) => {
+//   const sig = request.headers['stripe-signature']
+
+//   let event
+//   try {
+//     event = stripe.webhooks.constructEvent(request.body, sig, endpointSecret)
+//   } catch (err) {
+//     console.log(err.message)
+//     response.status(400).send(`Webhook Error: ${err.message}`)
+//     return
+//   }
+
+//   // Handle the event
+//   switch (event.type) {
+//     case 'payment_intent.succeeded':
+//       const data = event.data.object
+
+//       console.log(data)
+
+//       const customer = await stripe.customers.retrieve(data.customer)
+
+//       break
+
+//     case 'checkout.session.completed':
+//       const session = event.data.object
+//       const sessionDetail = await stripe.checkout.sessions.listLineItems(session.id, {
+//         expand: ['data.price.product'],
+//       })
+
+//       break
+
+//     // ... handle other event types
+//     default:
+//       console.log(`Unhandled event type ${event.type}`)
+//   }
+
+//   response.send()
+// })
+
+app.set('view engine', 'ejs')
 app.use(express.json())
-app.use(express.urlencoded())
+app.use(express.urlencoded({ extended: true }))
+
 app.use(express.static(path.join(__dirname, 'public')))
 app.use(
   methodOverride(function (req, res) {
@@ -52,12 +98,11 @@ app.use('/order', orderRoutes)
 app.use('/cart', cartRoutes)
 
 // Redirecting user to product page.
+// app.use('/', (req, res, next) => {
+//   res.redirect('/product')
+// })
 
-app.use('/', (req, res, next) => {
-  res.redirect('/product')
-})
-
-app.use(routeNotFound)
+// app.use(routeNotFound)
 
 db.sync({ alter: true })
   .then((result) => console.log('sync success'))

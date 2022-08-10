@@ -1,7 +1,9 @@
 const { OrderDetail, OrderItem, User, Cart, Products } = require('../models')
 const UserService = require('../services/userServices')
 
-const createOrder = async (userId, address) => {
+const createOrder = async (userId, session, { data }) => {
+
+  
   const userDetail = await User.findByPk(userId, {
     include: [
       {
@@ -17,28 +19,34 @@ const createOrder = async (userId, address) => {
 
   const { firstName: userFirstName, lastName: userLastName, phoneNumber: userMobileNo, Carts } = userDetail
 
-  let totalPrice = 0
-  let totalQuantity = 0
+  const address = session.shipping_details.address
 
-  Carts.forEach((item) => {
-    totalQuantity += item.quantity
-    totalPrice += item.Product.price * item.quantity
-  })
-
-  let addressDetail = null
-
-  if (address?.addressId) {
-    addressDetail = {}
-  } else {
-    addressDetail = {
-      shippingAddressLine1: 'test',
-      shippingLandmark: 'test',
-      shippingCountry: 'test',
-      shippingState: 'test',
-      shippingCity: 'test',
-      shippingPincode: 110011,
-    }
+  let addressDetail = {
+    shippingAddressLine1: address.line1,
+    shippingLandmark: '',
+    shippingCountry: address.country,
+    shippingState: address.state,
+    shippingCity: address.city,
+    shippingPincode: address.postal_code,
   }
+  const productDetails = []
+
+  let totalPrice,
+    totalQuantity = 0
+
+  data.forEach((item) => {
+    totalPrice += item.price
+    totalQuantity += item.quantity
+
+    productDetails.push({
+      productId: item.metadata.id,
+      productPrice: item.metadata.price,
+      quantity: item.quantity,
+      productTitle: item.name.title,
+      productImage: '',
+      productDescription: item.description,
+    })
+  })
 
   const orderDetail = await OrderDetail.create({
     userId,
@@ -50,7 +58,7 @@ const createOrder = async (userId, address) => {
     ...addressDetail,
   })
 
-  const orderItemsResult = await createOrderItem(orderDetail.id, Carts)
+  const orderItemsResult = await createOrderItem(orderDetail.id, productDetails)
 
   return { orderDetail, orderItemsResult }
 }
@@ -60,20 +68,8 @@ const updateOrderStatus = async (orderStatus) => {
 }
 
 const createOrderItem = async (orderId, cartItems) => {
-  let cartItemsPromises = []
-
-  cartItems.forEach((item) => {
-    const orderItem = {
-      orderId: orderId,
-      productId: item.productId,
-      productPrice: item.Product.price,
-      quantity: item.quantity,
-      productTitle: item.Product.title,
-      productImage: item.Product.imageUrl,
-      productDescription: item.descption,
-    }
-
-    cartItemsPromises.push(orderItem)
+  const cartItemsPromises = cartItems.map((item) => {
+    item.orderId = orderId
   })
   const result = await OrderItem.bulkCreate(cartItemsPromises)
 
