@@ -5,7 +5,7 @@ const productValidation = require('./../validations/productValidation')
 const productController = require('../controllers/productController')
 const multer = require('../utils/multer')
 const verifySession = require('./../middleware/verifySession')
-
+const multerWrapper = require('../middleware/multerWrapper')
 // Protected to login user only
 router.use(verifySession)
 
@@ -16,13 +16,23 @@ router.get('/', productController.allProducts)
 router.get('/addProduct', productController.getAddProductPage)
 
 // Post Add product
-router.post('/', multer.upload.single('myImage'), validate(productValidation.addProduct), productController.addProduct)
+router.post(
+  '/',
+  multerWrapper(multer.upload.single('myImage')),
+  validate(productValidation.addProduct),
+  productController.addProduct
+)
 
 // Get product Detail
-router.get('/:id', productController.getProduct)
+router.get('/:id', validate(productValidation.getProduct), productController.getProduct)
 
 // update product
-router.patch('/:id', productController.updateProduct)
+router.patch('/:id', multerWrapper(multer.upload.single('myImage')), productController.updateProduct)
+
+router.get('/updateProduct/:id', productController.updateProductPage)
+
+//delete a product
+router.delete('/:id', productController.deleteProduct)
 
 //Search Api
 router.get('/search', productController.searchProduct)

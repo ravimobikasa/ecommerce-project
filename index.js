@@ -12,7 +12,7 @@ const orderRoutes = require('./routes/orderRoutes')
 
 const productRoutes = require('./routes/productRoutes')
 const cartRoutes = require('./routes/cartRoutes')
-
+const routeNotFound = require('./middleware/notFoundError')
 dotenv.config()
 
 app.use(
@@ -50,6 +50,14 @@ app.use('/', userRoutes)
 app.use('/product', productRoutes)
 app.use('/order', orderRoutes)
 app.use('/cart', cartRoutes)
+
+// Redirecting user to product page.
+
+// app.use('/', (req, res, next) => {
+//   res.redirect('/product')
+// })
+
+app.use(routeNotFound)
 
 db.sync()
   .then((result) => console.log('sync success'))

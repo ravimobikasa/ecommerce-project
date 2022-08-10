@@ -1,6 +1,8 @@
 const { RESET_CONTENT } = require('http-status-codes')
 const { Products } = require('../models')
 const { Op } = require('sequelize')
+const fsPromises = require('fs/promises')
+const deleteImage = require('../utils/deleteImage')
 const addProduct = async (req, res) => {
   try {
     if (req.errors) {
@@ -10,7 +12,6 @@ const addProduct = async (req, res) => {
       return res.render('addProducts', { errorMessage: 'Please add a file' })
     }
     req.body.imageUrl = req.file.filename
-    console.log(req)
 
     const { title, price, description, imageUrl } = req.body
 
@@ -51,7 +52,7 @@ const allProducts = async (req, res) => {
 const getProduct = async (req, res) => {
   try {
     if (req.errors) {
-      return res.render('product', { errorMessage: req.errors })
+      return res.render('404error', { errorMessage: req.errors })
     }
 
     const id = req.params.id
@@ -61,31 +62,39 @@ const getProduct = async (req, res) => {
       },
     }
     const product = await Products.findOne(query)
-    if (product == null) {
-      return res.json('Product does not exist')
+    if (!product) {
+      return res.render('404error', { errorMessage: 'Product Not Found .....!' })
     }
     //console.log(product)
     res.render('product', { product: product })
     //res.json(product)
   } catch (err) {
-    res.json(err)
+    console.log('producterror', err)
   }
 }
 
 const updateProduct = async (req, res) => {
   try {
-    const { title, price, description } = req.body
-
     const id = req.params.id
+    if (!req.file) {
+      imageUrl = undefined
+    }
+    if (req.file) {
+      imageUrl = req.file.filename
+      // const filepath = './public/images/products/' + product.imageUrl
+      // const deleteResult = await deleteImage(filepath)
+    }
+
+    const { title, price, description } = req.body
 
     let query = {
       title,
-      imageUrl: req.file.filename,
+      imageUrl,
       price,
       descrption: description,
     }
-    const result = await Products.update(query, { where: id })
-
+    console.log(query)
+    const result = await Products.update(query, { where: { id } })
     res.json(result)
   } catch (err) {
     res.json(err)
@@ -114,9 +123,37 @@ const searchProduct = async (req, res) => {
     res.json(err)
   }
 }
+const deleteProduct = async (req, res) => {
+  try {
+    const id = req.params.id
+
+    const product = await Products.findOne({
+      where: { id },
+    })
+    if (!product) {
+      return res.json('product does not exists')
+    }
+    const filepath = './public/images/products/' + product.imageUrl
+    const result = await Products.destroy({
+      where: {
+        id,
+      },
+    })
+
+    const deleteResult = await deleteImage(filepath)
+    return res.redirect('/product')
+  } catch (err) {}
+}
 
 const getAddProductPage = (req, res) => {
   res.render('addproducts')
+}
+
+const updateProductPage = async (req, res) => {
+  const { id } = req.params
+  const product = await Products.findOne({ where: { id } })
+  console.log('product', product)
+  res.render('updateProduct', { product: product })
 }
 
 module.exports = {
@@ -126,4 +163,6 @@ module.exports = {
   updateProduct,
   searchProduct,
   getAddProductPage,
+  deleteProduct,
+  updateProductPage,
 }

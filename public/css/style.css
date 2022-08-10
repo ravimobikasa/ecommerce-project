@@ -23,3 +23,7 @@ body {
     height: 100px !important;
     object-fit: contain !important;
 }
+
+.bodycolor{
+    background-color: #dcdc;
+  }
