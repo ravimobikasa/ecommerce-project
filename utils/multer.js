@@ -18,8 +18,7 @@ function checkFileType(req, file, cb) {
   if (mimetype && extname) {
     return cb(null, true)
   } else {
-    req.errors = 'Images Only '
-    cb(null, true)
+    cb(null, false)
   }
 }
 

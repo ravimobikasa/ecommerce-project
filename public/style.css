@@ -8,6 +8,10 @@ body {
 }
 
 .product .product-title{
+    position: absolute;
+    right: 150px;
+    width: 200px;
+    height: 120px;
     color: black;
     font-weight: 600;
 }
@@ -19,3 +23,4 @@ body {
     color: black;
         font-weight: 600;
 }
+

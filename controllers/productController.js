@@ -6,7 +6,7 @@ const deleteImage = require('../utils/deleteImage')
 const addProduct = async (req, res) => {
   try {
     if (req.file == undefined) {
-      return res.render('addProducts', { formData: req.body, errorMessage: 'Please add a file' })
+      return res.render('addProducts', { formData: req.body, errorMessage: 'Please add a valid file' })
     }
     if (req.errors) {
       return res.render('addProducts', { formData: req.body, errorMessage: req.errors })
@@ -40,7 +40,7 @@ const allProducts = async (req, res) => {
     const { limit, offset } = req.query
 
     let query = {
-      limit: parseInt(limit) || 12,
+      limit: parseInt(limit) || 24,
       offset: parseInt(offset) || 0,
       order: [['createdAt', 'DESC']],
     }
@@ -86,15 +86,21 @@ const updateProduct = async (req, res) => {
       })
       return res.render('updateProduct', { errorMessage: req.errors, product: product })
     }
-    console.log('eguygddd', req.errors)
+
     if (!req.file) {
       imageUrl = undefined
     }
     if (req.file) {
+      const product = await Product.findOne({
+        where: { id },
+      })
+
+      const deletePath = product.imageUrl
+
       imageUrl = req.file.filename
-      console.log(req.file.filename)
-      // const filepath = './public/images/products/' + product.imageUrl || undefined
-      // const deleteResult = await deleteImage(filepath)
+
+      const filepath = './public/images/products/' + deletePath
+      const deleteResult = await deleteImage(filepath)
     }
 
     const { title, price, description } = req.body
@@ -105,7 +111,7 @@ const updateProduct = async (req, res) => {
       price,
       description,
     }
-    console.log(query)
+
     const result = await Product.update(query, { where: { id } })
     return res.redirect(`/product/${id}`)
     //res.json(result)
@@ -155,7 +161,9 @@ const deleteProduct = async (req, res) => {
 
     const deleteResult = await deleteImage(filepath)
     return res.redirect('/product')
-  } catch (err) {}
+  } catch (err) {
+    res.json(err)
+  }
 }
 
 const getAddProductPage = (req, res) => {
@@ -165,7 +173,7 @@ const getAddProductPage = (req, res) => {
 const updateProductPage = async (req, res) => {
   const { id } = req.params
   const product = await Product.findOne({ where: { id } })
-  console.log('product', product)
+
   res.render('updateProduct', { product: product })
 }
 
