@@ -3,6 +3,7 @@ const app = express()
 const dotenv = require('dotenv')
 const path = require('path')
 const session = require('express-session')
+const helmet = require('helmet')
 const SequelizeStore = require('connect-session-sequelize')(session.Store)
 const db = require('./config/db')
 const methodOverride = require('method-override')
@@ -33,6 +34,10 @@ app.set('view engine', 'ejs')
 app.use(express.json())
 app.use(express.urlencoded())
 app.use(express.static(path.join(__dirname, 'public')))
+
+// Set security HTTP headers
+app.use(helmet())
+
 app.use(
   methodOverride(function (req, res) {
     if (req.body && typeof req.body === 'object' && '_method' in req.body) {
@@ -42,8 +47,6 @@ app.use(
     }
   })
 )
-
-app.use(express.static(path.join(__dirname, 'public')))
 
 // Routes
 app.use('/', userRoutes)
