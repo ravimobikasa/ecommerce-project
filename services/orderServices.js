@@ -32,7 +32,7 @@ const createOrder = async (userId, session, { data }) => {
       productPrice: item.price.unit_amount / 100,
       quantity: item.quantity,
       productTitle: item.price.product.name,
-      productImage: '',
+      productImage: item.price.product?.images[0] || '',
       productDescription: item.price.product.description,
     })
   })

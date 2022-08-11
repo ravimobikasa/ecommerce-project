@@ -7,5 +7,6 @@ const verifySession = require('../middleware/verifySession')
 router.use(verifySession)
 router.route('/').get(orderController.getAllOrders)
 router.route('/checkout-session').get(orderController.createCheckoutSession)
+router.route('/:orderId').get(orderController.getOrder)
 
 module.exports = router

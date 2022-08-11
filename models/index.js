@@ -46,7 +46,7 @@ OrderItem.belongsTo(Product, {
     name: 'productId',
     allowNull: true,
   },
-  onDelete: 'CASCADE',
+  onDelete: 'SET NULL',
 })
 
 Cart.belongsTo(User, {

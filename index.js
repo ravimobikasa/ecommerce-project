@@ -32,6 +32,7 @@ app.use(
 
 app.set('view engine', 'ejs')
 
+//before other 
 app.post('/webhook', express.raw({ type: 'application/json' }), orderController.stripeWebHook)
 
 app.use(express.json())

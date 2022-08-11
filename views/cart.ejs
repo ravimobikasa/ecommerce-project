@@ -66,13 +66,14 @@
                                         <div class="d-flex flex-row mt-1">
                                             <p class="mb-0">Price:</p>
                                             <p class="ms-2 mb-0">
-                                                ₹<%= item.Product.price * item.quantity %>
+                                                ₹<%= item.Product.price %>
                                             </p>
                                         </div>
-                                        <form method="post"  action="/cart/remove/<%= item.Product.id%>">
-                                            <button type="submit" style="float:right" class="btn btn-primary btn-sm ">Remove</a>
+                                        <form method="post" action="/cart/remove/<%= item.Product.id%>">
+                                            <button type="submit" style="float:right"
+                                                class="btn btn-primary btn-sm ">Remove</a>
                                         </form>
-                                        
+
                                     </div>
                                 </div>
 

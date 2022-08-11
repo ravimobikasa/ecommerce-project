@@ -6,7 +6,6 @@ const multerErrorWrapper = (multer) => (req, res, next) => {
     } else if (err) {
       req.errors = err
     }
-
     next()
   })
 }

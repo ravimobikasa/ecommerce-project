@@ -1,65 +1,75 @@
 <%- include('partials/header.ejs') %>
 
-    <style>
-      .card-img-top {
-        height: 200px;
-        width: 400px;
-      }
-      .card-body{
-        position: absolute;
-        left:400px;
-         top:10PX;
-      } 
-      /* .btn btn-primary{
+  <style>
+    .card-img-top {
+      height: 200px;
+      width: 400px;
+    }
+
+    .card-body {
+      position: absolute;
+      left: 400px;
+      top: 10PX;
+    }
+
+    /* .btn btn-primary{
         height: 100px;
       
       } */
-    </style>
-      <div class="container-fluid px-5 pt-3">
-        <% if(typeof errorMessage != 'undefined' && errorMessage) { %>
-        <p class="errorMessage"><%- errorMessage %></p>
-        <% } %>
-        <div class="heading"> 
+  </style>
+  <div class="container-fluid px-5 pt-3">
+    <% if(typeof errorMessage !='undefined' && errorMessage) { %>
+      <p class="errorMessage">
+        <%- errorMessage %>
+      </p>
+      <% } %>
+        <div class="heading">
           <h2>Product Details</h2>
         </div>
         <div class="row mt-4 ">
           <div class="col">
             <div class="card">
-              <img class="card-img-top px-1" style="object-fit:contain" src="/images/products/<%=product.imageUrl %>" alt="Card image" />
+              <img class="card-img-top px-1" style="object-fit:contain" src="/images/products/<%=product.imageUrl %>"
+                alt="Card image" />
               <div class="card-body">
-                <h3 class="card-title" ><%= product.title %></h3>
-                <h4 class="card-text">₹ <%= product.price %></h4>
-                <p class="card-text" ><%= product.description %></p>
+                <h3 class="card-title">
+                  <%= product.title %>
+                </h3>
+                <h4 class="card-text">₹ <%= product.price %>
+                </h4>
+                <p class="card-text">
+                  <%= product.description %>
+                </p>
               </div>
-                <div class=" col d-flex justify-content-end py-2 IMAGE">
-                  <form method="post" action="/cart">
-                      <input type="hidden" name="productId" value="<%=product.id%>" />
-                      <button type="submit"  class="btn btn-primary btn-sm">Add
-                          to cart      </a>
-                  </form>
+              <div class=" col d-flex justify-content-end py-2 IMAGE">
+                <form method="post" action="/cart">
+                  <input type="hidden" name="productId" value="<%=product.id%>" />
+                  <button type="submit" class="btn btn-primary btn-sm">Add
+                    to cart </a>
+                </form>
               </div>
               <div class=" col d-flex justify-content-end py-2">
                 <form method="get" action="/product/updateProduct/<%=product.id%>">
-                    <button type="submit" class="btn btn-primary btn-sm ">Update Product</a> 
+                  <button type="submit" class="btn btn-primary btn-sm ">Update Product</a>
                 </form>
-            </div>
+              </div>
               <div>
-                <form method="post" action="/product/<%=product.id%>" onsubmit="return myFunction()" >
+                <form method="post" action="/product/<%=product.id%>" onsubmit="return myFunction()">
                   <input type="hidden" name="_method" value="delete" />
                   <button type="submit" style="float:right" class="btn btn-primary btn-sm ">Delete</a>
-              </form>
-            </div>
+                </form>
               </div>
-            
             </div>
+
           </div>
         </div>
-      </div>
-      <script>
-        function myFunction() {
-          let text = "Press Ok to delete product";
-          return confirm(text) 
+  </div>
+  </div>
+  <script>
+    function myFunction() {
+      let text = "Press Ok to delete product";
+      return confirm(text)
 
-        }
-        </script>
-<%- include('partials/footer.ejs') %>
+    }
+  </script>
+  <%- include('partials/footer.ejs') %>
