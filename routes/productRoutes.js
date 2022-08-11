@@ -39,7 +39,4 @@ router.get('/updateProduct/:id', productController.updateProductPage)
 //delete a product
 router.delete('/:id', productController.deleteProduct)
 
-//Search Api
-router.get('/search', productController.searchProduct)
-
 module.exports = router
