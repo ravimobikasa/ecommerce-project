@@ -1,34 +1,42 @@
 const { Cart, Product } = require('../models')
 
 const addToCart = async (req, res) => {
-  const { id: userId } = req.user
-  const { productId } = req.body
+  try {
+    const { id: userId } = req.user
+    const { productId } = req.body
 
-  const cart = await Cart.findOne({ where: { userId, productId } })
+    const cart = await Cart.findOne({ where: { userId, productId } })
 
-  if (!cart) {
-    const newCart = await Cart.create({ userId, productId })
+    if (!cart) {
+      const newCart = await Cart.create({ userId, productId })
+      return res.redirect('/cart')
+    }
+
+    const newCart = await cart.increment('quantity', { by: 1 })
+
     return res.redirect('/cart')
+  } catch (err) {
+    res.render('500error')
   }
-
-  const newCart = await cart.increment('quantity', { by: 1 })
-
-  return res.redirect('/cart')
 }
 
 const getCartProducts = async (req, res) => {
-  const { id: userId } = req.user
-  const products = await Cart.findAll({ where: { userId }, include: [Product] })
+  try {
+    const { id: userId } = req.user
+    const products = await Cart.findAll({ where: { userId }, include: [Product] })
 
-  let totalItem = 0
-  let totalPrice = 0
+    let totalItem = 0
+    let totalPrice = 0
 
-  products.forEach((item) => {
-    totalItem += item.quantity
-    totalPrice += item.Product.price * item.quantity
-  })
+    products.forEach((item) => {
+      totalItem += item.quantity
+      totalPrice += item.Product.price * item.quantity
+    })
 
-  res.render('cart', { products: products, totalItem, totalPrice })
+    res.render('cart', { products: products, totalItem, totalPrice })
+  } catch {
+    res.render('500error')
+  }
 }
 
 const deleteCartItem = async (req, res) => {
@@ -52,8 +60,7 @@ const deleteCartItem = async (req, res) => {
 
     return res.redirect('/cart')
   } catch (err) {
-    console.log('Error Logs')
-    console.log(err)
+    res.render('500error')
   }
 }
 const removeCartProduct = async (req, res) => {
@@ -65,7 +72,7 @@ const removeCartProduct = async (req, res) => {
 
     return res.redirect('/cart')
   } catch (err) {
-    console.log('error', err)
+    res.render('500error')
   }
 }
 

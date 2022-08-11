@@ -29,7 +29,7 @@ const addProduct = async (req, res) => {
 
     res.redirect('/product')
   } catch (err) {
-    res.json(err)
+    res.render('500error')
   }
 }
 const allProducts = async (req, res) => {
@@ -37,17 +37,58 @@ const allProducts = async (req, res) => {
     if (req.errors) {
       return res.render('products', { errorMessage: req.errors })
     }
-    const { limit, offset } = req.query
+    let { limit, page, search } = req.query
 
-    let query = {
-      limit: parseInt(limit) || 24,
-      offset: parseInt(offset) || 0,
-      order: [['createdAt', 'DESC']],
+    limit = parseInt(limit) || 12
+    page = parseInt(page) || 1
+    let _search = search || ''
+    page = Math.abs(page)
+    let offset = page * limit - limit
+    let query
+    let count
+    if (!search) {
+      query = {
+        limit: Math.abs(limit),
+        offset: offset,
+        order: [['createdAt', 'DESC']],
+      }
+      count = await Product.count()
     }
+    if (search) {
+      query = {
+        where: {
+          [Op.or]: {
+            title: {
+              [Op.substring]: `${_search}`,
+            },
+            description: {
+              [Op.substring]: `${_search}`,
+            },
+          },
+        },
+        limit: Math.abs(limit),
+        offset: offset,
+        order: [['createdAt', 'DESC']],
+      }
+      count = await Product.count({
+        where: {
+          [Op.or]: {
+            title: {
+              [Op.substring]: `${_search}`,
+            },
+            description: {
+              [Op.substring]: `${_search}`,
+            },
+          },
+        },
+      })
+    }
+
     const products = await Product.findAll(query)
-    res.render('products', { products: products })
+
+    res.render('products', { products: products, pagination: { count, limit, page } })
   } catch (err) {
-    res.json(err)
+    res.render('500error')
   }
 }
 const getProduct = async (req, res) => {
@@ -66,11 +107,9 @@ const getProduct = async (req, res) => {
     if (!product) {
       return res.render('404error', { errorMessage: 'Product Not Found .....!' })
     }
-    //console.log(product)
     res.render('product', { product: product })
-    //res.json(product)
   } catch (err) {
-    console.log('producterror', err)
+    res.render('500error')
   }
 }
 
@@ -114,34 +153,11 @@ const updateProduct = async (req, res) => {
 
     const result = await Product.update(query, { where: { id } })
     return res.redirect(`/product/${id}`)
-    //res.json(result)
   } catch (err) {
-    res.json(err)
+    res.render('500error')
   }
 }
 
-const searchProduct = async (req, res) => {
-  try {
-    const { search } = req.query
-    console.log(search)
-    const result = await Product.findAll({
-      where: {
-        [Op.or]: {
-          title: {
-            [Op.substring]: `${search}`,
-          },
-          descrption: {
-            [Op.substring]: `${search}`,
-          },
-        },
-      },
-    })
-    console.log(result)
-    res.json(result)
-  } catch (err) {
-    res.json(err)
-  }
-}
 const deleteProduct = async (req, res) => {
   try {
     const id = req.params.id
@@ -162,7 +178,7 @@ const deleteProduct = async (req, res) => {
     const deleteResult = await deleteImage(filepath)
     return res.redirect('/product')
   } catch (err) {
-    res.json(err)
+    res.render('500error')
   }
 }
 
@@ -171,10 +187,14 @@ const getAddProductPage = (req, res) => {
 }
 
 const updateProductPage = async (req, res) => {
-  const { id } = req.params
-  const product = await Product.findOne({ where: { id } })
+  try {
+    const { id } = req.params
+    const product = await Product.findOne({ where: { id } })
 
-  res.render('updateProduct', { product: product })
+    res.render('updateProduct', { product: product })
+  } catch (err) {
+    res.render('500error')
+  }
 }
 
 module.exports = {
@@ -182,7 +202,6 @@ module.exports = {
   allProducts,
   getProduct,
   updateProduct,
-  searchProduct,
   getAddProductPage,
   deleteProduct,
   updateProductPage,

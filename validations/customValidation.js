@@ -1,5 +1,12 @@
+const isAlphabet = (value, helpers) => {
+  const field = helpers.state.path[0]
+  if (!value.match(/^[A-Za-z\s]{1,}[\.]{0,1}[A-Za-z\s]{0,}$/)) {
+    return helpers.message('{{#label}} must have an alphabet')
+  }
+  return value
+}
+
 const password = (value, helpers) => {
-  console.log('value1', value.length)
   if (value.length < 8) {
     return helpers.message('password must be at least 8 characters')
   }
@@ -26,4 +33,5 @@ module.exports = {
   password,
   phoneNumber,
   priceValidate,
+  isAlphabet,
 }
