@@ -32,8 +32,7 @@ const registerUser = async (req, res) => {
 
     res.redirect('/login')
   } catch (err) {
-    // will be shown on error page
-    console.log('error', err)
+    res.render('500error')
   }
 }
 
@@ -44,9 +43,7 @@ const login = async (req, res) => {
     }
 
     const { email, password } = req.body
-
     const user = await User.findOne({ where: { email } })
-
     if (!user || !(await hashPassword.comparePassword(password, user.password))) {
       return res.render('login', { formData: req.body, errorMessage: 'Please enter correct email or password' })
     }
@@ -56,16 +53,16 @@ const login = async (req, res) => {
     req.session.user = {
       id: user.id,
     }
+
     // After login user redirect to shop page
     res.redirect('/product')
   } catch (err) {
-    // will be shown on error page
-    console.log('error', err)
+    res.render('500error')
   }
 }
 
-const logOut = (req, res) => {
-  req.session.destroy()
+const logOut = async (req, res) => {
+  await req.session.destroy()
   res.redirect('/login')
 }
 
@@ -77,10 +74,15 @@ const registerPage = (req, res) => {
   res.render('register')
 }
 
+const home = (req, res) => {
+  res.redirect('/product')
+}
+
 module.exports = {
   registerUser,
   login,
   logOut,
   loginPage,
   registerPage,
+  home,
 }

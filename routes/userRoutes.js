@@ -3,6 +3,7 @@ const router = express.Router()
 const validate = require('./../middleware/validate')
 const userValidation = require('./../validations/userValidation')
 const userController = require('./../controllers/userController')
+const verifySession = require('./../middleware/verifySession')
 
 //Register routes
 router.get('/register', userController.registerPage)
@@ -14,5 +15,10 @@ router.post('/login', validate(userValidation.login), userController.login)
 
 // Logout route
 router.all('/logout', userController.logOut)
+
+router.use(verifySession)
+
+// Home page
+router.get('/', userController.home)
 
 module.exports = router
