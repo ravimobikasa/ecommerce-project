@@ -42,7 +42,11 @@ OrderItem.belongsTo(OrderDetail, {
 })
 
 OrderItem.belongsTo(Product, {
-  foreignKey: 'productId',
+  foreignKey: {
+    name: 'productId',
+    allowNull: true,
+  },
+  onDelete: 'CASCADE',
 })
 
 Cart.belongsTo(User, {

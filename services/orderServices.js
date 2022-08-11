@@ -1,4 +1,4 @@
-const { OrderDetail, OrderItem, User, Cart, Products } = require('../models')
+const { OrderDetail, OrderItem, User, Cart, Product } = require('../models')
 const UserService = require('../services/userServices')
 
 const createOrder = async (userId, session, { data }) => {

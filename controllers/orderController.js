@@ -1,8 +1,9 @@
 const { orderService } = require('../services')
-const { Cart, OrderDetail, Products, User, OrderItem } = require('../models')
+const { Cart, OrderDetail, Product, User, OrderItem } = require('../models')
 const stripe = require('../payment/stripe')
 
 const stripeWebHook = async (req, res) => {
+
   const endpointSecret = process.env.END_POINT_SECRET
 
   const signature = req.headers['stripe-signature']
@@ -52,7 +53,7 @@ const createCheckoutSession = async (req, res) => {
       metadata: { userId },
     })
 
-    const cartItems = await Cart.findAll({ where: { userId }, include: [Products] })
+    const cartItems = await Cart.findAll({ where: { userId }, include: [Product] })
 
     const stripeLineItems = cartItems.map((item) => {
       return {
@@ -61,7 +62,7 @@ const createCheckoutSession = async (req, res) => {
           product_data: {
             name: item.Product.title,
             images: [item.Product.imageUrl],
-            description: item.Product.descrption,
+            description: item.Product.description,
             metadata: {
               id: item.Product.id,
               price: item.Product.price,
@@ -88,7 +89,8 @@ const createCheckoutSession = async (req, res) => {
     })
     res.redirect(303, session.url)
   } catch (err) {
-    res.json(err)
+    console.log(err)
+    res.json({ error: err })
   }
 }
 
