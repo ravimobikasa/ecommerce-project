@@ -1,0 +1,50 @@
+<%- include('partials/header.ejs') %>
+    <section>
+        <div class="container mt-5">
+            <h3> Orders </h3>
+            <table class="table table-striped">
+
+                <thead>
+                    <tr>
+                        <th>OrderId</th>
+                        <th>FullName</th>
+                        <th>Mobile No</th>
+                        <th>Total Quantity</th>
+                        <th>Total Price ( ₹ )</th>
+                        <th>Order Status</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    <% orders?.forEach(item=> { %>
+                        <tr>
+                            <td>
+                                <%= item.id %>
+                            </td>
+                            <td>
+                                <%= item.userFirstName +" "+item.userLastName%>
+                    </td>
+<td>
+    <%=item.userMobileNo %>
+</td>
+<td>
+    <%=item.totalQuantity %>
+</td>
+
+<td><%=item.totalPrice %></td>
+
+<td>
+    <%=item.orderStatus %>
+</td>
+
+
+                        </tr>
+
+                    <% })%>
+            </tbody>
+            </table>
+
+        </div>
+    </section>
+
+    <%- include('partials/footer.ejs') %>
