@@ -2,12 +2,12 @@
 const { DataTypes, Model } = require('sequelize')
 const sequelize = require('../config/db')
 
-class Products extends Model {
+class Product extends Model {
   static associate(models) {
     // define association here
   }
 }
-Products.init(
+Product.init(
   {
     title: {
       type: DataTypes.STRING,
@@ -21,8 +21,8 @@ Products.init(
       type: DataTypes.FLOAT,
       allowNull: false,
     },
-    descrption: {
-      type: DataTypes.STRING,
+    description: {
+      type: DataTypes.TEXT,
       allowNull: false,
     },
   },
@@ -31,4 +31,4 @@ Products.init(
     modelName: 'Products',
   }
 )
-module.exports = Products
+module.exports = Product

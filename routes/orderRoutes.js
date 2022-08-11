@@ -1,11 +1,11 @@
 const router = require('express').Router()
 
-const { createOrder, createCheckout } = require('../controllers/orderController')
+const orderController = require('../controllers/orderController')
 const verifySession = require('../middleware/verifySession')
 
 // Protected to login user only
 router.use(verifySession)
-router.route('/create').all(createOrder)
-router.route('/checkout-session').get(createCheckout)
+router.route('/').get(orderController.getAllOrders)
+router.route('/checkout-session').get(orderController.createCheckoutSession)
 
 module.exports = router

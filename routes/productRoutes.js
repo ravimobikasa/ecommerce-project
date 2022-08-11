@@ -15,7 +15,7 @@ router.get('/', productController.allProducts)
 //Add product Page
 router.get('/addProduct', productController.getAddProductPage)
 
-// Post Add product
+//Add product
 router.post(
   '/',
   multerWrapper(multer.upload.single('myImage')),
@@ -24,10 +24,20 @@ router.post(
 )
 
 // Get product Detail
-router.get('/:id', productController.getProduct)
+router.get('/:id', validate(productValidation.getProduct), productController.getProduct)
 
 // update product
-router.patch('/:id', productController.updateProduct)
+router.post(
+  '/:id',
+  multerWrapper(multer.upload.single('myImage')),
+  validate(productValidation.updateProduct),
+  productController.updateProduct
+)
+
+router.get('/updateProduct/:id', productController.updateProductPage)
+
+//delete a product
+router.delete('/:id', productController.deleteProduct)
 
 //Search Api
 router.get('/search', productController.searchProduct)

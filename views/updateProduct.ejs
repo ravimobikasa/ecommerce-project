@@ -1,0 +1,41 @@
+<%- include('partials/header.ejs') %><!DOCTYPE html>
+
+    <div class="backgroundColor">
+      <div class="container p-5">
+        <% if(typeof errorMessage != 'undefined' && errorMessage) { %>
+        <p class="errorMessage"><%- errorMessage %></p>
+        <% } %>
+        <form action="/product/<%=product.id%>" method="post" enctype="multipart/form-data" >
+           
+           
+          <div class="mb-3">
+            <label class="form-label">Product Title</label>
+            <input type="text" class="form-control" placeholder="Enter the product title" name="title" value="<%=product.title%>" required />
+          </div>
+          <div>
+        
+            <img class=" card-img-top p-1 img-fluid img-thumbnail w-25 h-25 "
+            src=" /../images/products/<%=product.imageUrl%>"  alt="Card image">
+          </div>
+          <div class="mb-3">
+            
+            <label for="" class="form-label">Upload Image</label>
+            <input type="file" name="myImage" value="<%=product.imageUrl%>" class="form-control" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Price</label>
+            <input  class="form-control" placeholder="00" step=".01" min="1" name="price" value="<%=product.price%>" required />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Description</label>
+            <textarea class="form-control" placeholder="product details" name="description" cols="60" rows="10" required ><%=product.description%>
+            </textarea>
+          </div>
+
+          <button type="submit" class="btn btn-primary">Update Product</button>
+
+        </form>
+      </div>
+    </div>
+
+<%- include('partials/footer.ejs') %>

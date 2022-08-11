@@ -1,4 +1,4 @@
-const { Cart, Products } = require('../models')
+const { Cart, Product } = require('../models')
 
 const addToCart = async (req, res) => {
   const { id: userId } = req.user
@@ -18,8 +18,7 @@ const addToCart = async (req, res) => {
 
 const getCartProducts = async (req, res) => {
   const { id: userId } = req.user
-
-  const products = await Cart.findAll({ where: { userId }, include: [Products] })
+  const products = await Cart.findAll({ where: { userId }, include: [Product] })
 
   let totalItem = 0
   let totalPrice = 0
@@ -57,9 +56,22 @@ const deleteCartItem = async (req, res) => {
     console.log(err)
   }
 }
+const removeCartProduct = async (req, res) => {
+  try {
+    const { id: userId } = req.user
+    const { productId } = req.params
+
+    const cart = await Cart.destroy({ where: { userId, productId } })
+
+    return res.redirect('/cart')
+  } catch (err) {
+    console.log('error', err)
+  }
+}
 
 module.exports = {
   addToCart,
   deleteCartItem,
   getCartProducts,
+  removeCartProduct,
 }

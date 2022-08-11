@@ -2,7 +2,7 @@
 
 
     <section>
-        <div class="container pt-3">
+        <div class="container-fluid px-5 pt-3">
             <div class="heading ">
                 <h2>Products</h2>
             </div>
@@ -23,10 +23,6 @@
                                     <h5 class="product-title ">
                                         <%= item.title %>
                                     </h5>
-                                    <p class="product-desc">
-                                        <%= item.descrption %>
-                                    </p>
-
 
                                     <div class="row">
 
@@ -34,7 +30,7 @@
                                             <h5 class="price">
                                                 ₹<%= item.price %>
                                             </h5>
-                                        </div>
+                                    </div>
                                         <div class=" col d-flex justify-content-end">
                                             <form method="post" action="/cart">
                                                 <input type="hidden" name="productId" value="<%=item.id%>" />
