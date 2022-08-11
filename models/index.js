@@ -17,7 +17,7 @@ User.hasMany(Address, {
   foreignKey: 'userId',
 })
 
-User.hasOne(Cart, {
+User.hasMany(Cart, {
   foreignKey: 'userId',
 })
 
@@ -42,7 +42,11 @@ OrderItem.belongsTo(OrderDetail, {
 })
 
 OrderItem.belongsTo(Product, {
-  foreignKey: 'productId',
+  foreignKey: {
+    name: 'productId',
+    allowNull: true,
+  },
+  onDelete: 'CASCADE',
 })
 
 Cart.belongsTo(User, {
@@ -57,6 +61,7 @@ module.exports = {
   User,
   Address,
   OrderDetail,
+  OrderItem,
   Cart,
   Product,
 }

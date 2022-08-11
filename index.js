@@ -13,6 +13,7 @@ const orderRoutes = require('./routes/orderRoutes')
 const productRoutes = require('./routes/productRoutes')
 const cartRoutes = require('./routes/cartRoutes')
 const routeNotFound = require('./middleware/notFoundError')
+const orderController = require('./controllers/orderController')
 dotenv.config()
 
 app.use(
@@ -30,9 +31,11 @@ app.use(
 
 app.set('view engine', 'ejs')
 
+app.post('/webhook', express.raw({ type: 'application/json' }), orderController.stripeWebHook)
+
 // Body parser, reading data from body into req.body
 app.use(express.json())
-app.use(express.urlencoded())
+app.use(express.urlencoded({ extended: true }))
 
 // Serving static files
 app.use(express.static(path.join(__dirname, 'public')))
@@ -55,7 +58,7 @@ app.use('/cart', cartRoutes)
 
 app.use(routeNotFound)
 
-db.sync()
+db.sync({ alter: true })
   .then((result) => console.log('sync success'))
   .catch((err) => console.log('sync error ', err.message))
 

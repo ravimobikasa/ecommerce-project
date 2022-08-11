@@ -1,23 +1,110 @@
 const { orderService } = require('../services')
+const { Cart, OrderDetail, Product, User, OrderItem } = require('../models')
+const stripe = require('../payment/stripe')
 
-const createOrder = async (req, res) => {
+const stripeWebHook = async (req, res) => {
+  const endpointSecret = process.env.END_POINT_SECRET
+
+  const signature = req.headers['stripe-signature']
   try {
-    const { id: userId } = req.user
+    let event = stripe.webhooks.constructEvent(req.body, signature, endpointSecret)
 
-    const { address, cart } = req.body
+    switch (event.type) {
+      case 'payment_intent.succeeded':
+        break
 
-    const orderResult = await orderService.createOrder(userId, cart, address)
+      case 'checkout.session.completed':
+        const data = event.data.object
+        const customer = await stripe.customers.retrieve(data.customer)
+        const session = event.data.object
 
-    res.json({
-      orderResult,
-    })
+        const sessionDetail = await stripe.checkout.sessions.listLineItems(session.id, {
+          expand: ['data.price.product'],
+        })
+
+        await orderService.createOrder(customer.metadata.userId, session, sessionDetail)
+
+        await Cart.destroy({ where: { userId: customer.metadata.userId } })
+        break
+
+      default:
+        console.log(`Unhandled event type ${event.type}`)
+    }
+
+    res.send()
   } catch (err) {
-    res.json({
-      message: err,
-    })
+    console.log(err?.message)
+    res.status(400).send(`Webhook Error: ${err?.message}`)
   }
 }
 
+const createCheckoutSession = async (req, res) => {
+  const currency = 'inr'
+  const allowedCountryISOCodes = ['IN']
+  const userId = req.user.id
+
+  const successURL = `${req.protocol}://${req.get('host')}/order`
+  const cancelURL = `${req.protocol}://${req.get('host')}/cart`
+
+  try {
+    const user = await User.findByPk(userId)
+
+    const customer = await stripe.customers.create({
+      email: user.email,
+      metadata: { userId },
+    })
+
+    const cartItems = await Cart.findAll({ where: { userId }, include: [Product] })
+
+    const stripeLineItems = cartItems.map((item) => {
+      return {
+        price_data: {
+          currency: currency,
+          product_data: {
+            name: item.Product.title,
+            images: [item.Product.imageUrl],
+            description: item.Product.description,
+            metadata: {
+              id: item.Product.id,
+              price: item.Product.price,
+            },
+          },
+          unit_amount: item.Product.price * 100,
+        },
+        quantity: item.quantity,
+      }
+    })
+
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      mode: 'payment',
+      currency: currency,
+      line_items: stripeLineItems,
+      shipping_address_collection: {
+        allowed_countries: allowedCountryISOCodes,
+      },
+      expand: ['line_items'],
+      customer: customer.id,
+      success_url: successURL,
+      cancel_url: cancelURL,
+    })
+    res.redirect(303, session.url)
+  } catch (err) {
+    console.log(err)
+    res.json({ error: err })
+  }
+}
+
+const getAllOrders = async (req, res) => {
+  const orders = await OrderDetail.findAll({
+    include: [OrderItem],
+  })
+
+  res.render('orders', { orders })
+}
+
 module.exports = {
-  createOrder,
+  createCheckoutSession,
+  stripeWebHook,
+  getAllOrders,
 }
