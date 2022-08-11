@@ -3,7 +3,6 @@ const app = express()
 const dotenv = require('dotenv')
 const path = require('path')
 const session = require('express-session')
-const helmet = require('helmet')
 const SequelizeStore = require('connect-session-sequelize')(session.Store)
 const db = require('./config/db')
 const methodOverride = require('method-override')
@@ -34,13 +33,12 @@ app.set('view engine', 'ejs')
 
 app.post('/webhook', express.raw({ type: 'application/json' }), orderController.stripeWebHook)
 
+// Body parser, reading data from body into req.body
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
+// Serving static files
 app.use(express.static(path.join(__dirname, 'public')))
-
-// Set security HTTP headers
-app.use(helmet())
 
 app.use(
   methodOverride(function (req, res) {
@@ -57,15 +55,6 @@ app.use('/', userRoutes)
 app.use('/product', productRoutes)
 app.use('/order', orderRoutes)
 app.use('/cart', cartRoutes)
-
-//Redirecting user to product page.
-app.use('/', (req, res, next) => {
-  res.redirect('/product')
-})
-
-app.use('/', (req, res, next) => {
-  res.redirect('/product')
-})
 
 app.use(routeNotFound)
 

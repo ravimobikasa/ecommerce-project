@@ -1,5 +1,4 @@
 const password = (value, helpers) => {
-  console.log('value1', value.length)
   if (value.length < 8) {
     return helpers.message('password must be at least 8 characters')
   }

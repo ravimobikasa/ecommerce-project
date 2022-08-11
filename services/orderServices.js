@@ -23,6 +23,7 @@ const createOrder = async (userId, session, { data }) => {
   let totalQuantity = 0
 
   data.forEach((item) => {
+    console.log(item.amount_total)
     totalPrice += item.amount_total
     totalQuantity += item.quantity
 
@@ -36,7 +37,7 @@ const createOrder = async (userId, session, { data }) => {
     })
   })
 
-  totalPrice += totalPrice / 100
+  totalPrice /= 100
 
   const orderDetail = await OrderDetail.create({
     userId,
@@ -45,6 +46,7 @@ const createOrder = async (userId, session, { data }) => {
     userFirstName,
     userLastName,
     userMobileNo,
+    orderStatus: 'CONFIRMED',
     ...addressDetail,
   })
 

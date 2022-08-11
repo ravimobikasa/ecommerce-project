@@ -3,7 +3,6 @@ const { Cart, OrderDetail, Product, User, OrderItem } = require('../models')
 const stripe = require('../payment/stripe')
 
 const stripeWebHook = async (req, res) => {
-
   const endpointSecret = process.env.END_POINT_SECRET
 
   const signature = req.headers['stripe-signature']
@@ -24,6 +23,8 @@ const stripeWebHook = async (req, res) => {
         })
 
         await orderService.createOrder(customer.metadata.userId, session, sessionDetail)
+
+        await Cart.destroy({ where: { userId: customer.metadata.userId } })
         break
 
       default:
@@ -95,12 +96,11 @@ const createCheckoutSession = async (req, res) => {
 }
 
 const getAllOrders = async (req, res) => {
-  const result = await OrderDetail.findAll({
+  const orders = await OrderDetail.findAll({
     include: [OrderItem],
   })
-  res.json({
-    result,
-  })
+
+  res.render('orders', { orders })
 }
 
 module.exports = {
