@@ -1,32 +1,42 @@
-const { OrderDetail, OrderItem, User, Cart, Product } = require('../models')
+const { OrderDetail, OrderItem, User, Cart, Products } = require('../models')
 const UserService = require('../services/userServices')
 
-const createOrder = async (userId = 1) => {
-  const userDetail = await User.findByPk(userId, {
-    include: [
-      {
-        model: Cart,
-        include: [Product],
-      },
-    ],
-  })
+const createOrder = async (userId, session, { data }) => {
+  const userDetail = await User.findByPk(userId)
 
-  const { userFirstName, userLastName, userMobileNo, carts } = userDetail
+  const { firstName: userFirstName, lastName: userLastName, phoneNumber: userMobileNo } = userDetail
 
-  let totalPrice, totalQuantity = 0
+  const address = session.shipping_details.address
 
-  carts.forEach((item) => {
-    totalQuantity += item.quantity
-    totalPrice += item.totalPrice
-  })
-
-  let addressDetail = null
-
-  if (address.addressId) {
-    addressDetail = {}
-  } else {
-    addressDetail = address
+  let addressDetail = {
+    shippingAddressLine1: address.line1,
+    shippingLandmark: '',
+    shippingCountry: address.country,
+    shippingState: address.state,
+    shippingCity: address.city,
+    shippingPincode: address.postal_code,
   }
+
+  const productDetails = []
+
+  let totalPrice = 0
+  let totalQuantity = 0
+
+  data.forEach((item) => {
+    totalPrice += item.amount_total
+    totalQuantity += item.quantity
+
+    productDetails.push({
+      productId: parseInt(item.price.product.metadata.id),
+      productPrice: item.price.unit_amount / 100,
+      quantity: item.quantity,
+      productTitle: item.price.product.name,
+      productImage: '',
+      productDescription: item.price.product.description,
+    })
+  })
+
+  totalPrice += totalPrice / 100
 
   const orderDetail = await OrderDetail.create({
     userId,
@@ -38,35 +48,20 @@ const createOrder = async (userId = 1) => {
     ...addressDetail,
   })
 
-  const orderItemsResult = await createOrderItem(orderDetail.orderId, carts)
+  const orderItemsResult = await createOrderItem(orderDetail.id, productDetails)
 
-  return orderDetail
+  return { orderDetail, orderItemsResult }
 }
 
-const updateOrderStatus = async (orderStatus) => {
-  const orderDetail = await OrderDetail.update()
-}
-
-const createOrderItem = async (orderId, cartItems) => {
-  let cartItemsPromises = []
-
-  cartItems.forEach((item) => {
-    const orderItem = OrderItem.create({
-      orderId: orderId,
-      productId: item.productId,
-      productPrice: item.productPrice,
-      quantity: item.quantity,
-      productTitle: item.productTitle,
-      productImage: item.productImage,
-      productDescription: item.productDescription,
-    })
-    cartItemsPromises.push(orderItem)
+const createOrderItem = async (orderId, productDetails) => {
+  const orderItems = productDetails.map((item) => {
+    item.orderId = orderId
+    return item
   })
-
-  return await Promise.all(cartItemsPromises)
+  const result = await OrderItem.bulkCreate(orderItems)
+  return result
 }
 
 module.exports = {
   createOrder,
-  updateOrderStatus,
 }

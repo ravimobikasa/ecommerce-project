@@ -14,6 +14,7 @@ const orderRoutes = require('./routes/orderRoutes')
 const productRoutes = require('./routes/productRoutes')
 const cartRoutes = require('./routes/cartRoutes')
 const routeNotFound = require('./middleware/notFoundError')
+const orderController = require('./controllers/orderController')
 dotenv.config()
 
 app.use(
@@ -31,8 +32,11 @@ app.use(
 
 app.set('view engine', 'ejs')
 
+app.post('/webhook', express.raw({ type: 'application/json' }), orderController.stripeWebHook)
+
 app.use(express.json())
-app.use(express.urlencoded())
+app.use(express.urlencoded({ extended: true }))
+
 app.use(express.static(path.join(__dirname, 'public')))
 
 // Set security HTTP headers
@@ -54,15 +58,18 @@ app.use('/product', productRoutes)
 app.use('/order', orderRoutes)
 app.use('/cart', cartRoutes)
 
-// Redirecting user to product page.
+//Redirecting user to product page.
+app.use('/', (req, res, next) => {
+  res.redirect('/product')
+})
 
-// app.use('/', (req, res, next) => {
-//   res.redirect('/product')
-// })
+app.use('/', (req, res, next) => {
+  res.redirect('/product')
+})
 
 app.use(routeNotFound)
 
-db.sync()
+db.sync({ alter: true })
   .then((result) => console.log('sync success'))
   .catch((err) => console.log('sync error ', err.message))
 
