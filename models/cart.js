@@ -1,9 +1,7 @@
-const { Model , DataTypes } = require('sequelize');
+const { Model, DataTypes } = require('sequelize')
 const sequelize = require('../config/db')
 
-
 class Cart extends Model {
-    
   static associate(models) {
     // define association here
   }
@@ -21,7 +19,7 @@ Cart.init(
     quantity: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      defaultValue: 1
+      defaultValue: 1,
     },
   },
   {
