@@ -56,9 +56,22 @@ const deleteCartItem = async (req, res) => {
     console.log(err)
   }
 }
+const removeCartProduct = async (req, res) => {
+  try {
+    const { id: userId } = req.user
+    const { productId } = req.params
+
+    const cart = await Cart.destroy({ where: { userId, productId } })
+
+    return res.redirect('/cart')
+  } catch (err) {
+    console.log('error', err)
+  }
+}
 
 module.exports = {
   addToCart,
   deleteCartItem,
   getCartProducts,
+  removeCartProduct,
 }
