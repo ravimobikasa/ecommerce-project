@@ -43,7 +43,7 @@ OrderDetail.init(
     },
     shippingAddressLine1: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     shippingAddressLine2: {
       type: DataTypes.STRING,
@@ -53,19 +53,19 @@ OrderDetail.init(
     },
     shippingCity: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     shippingState: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     shippingCountry: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     shippingPincode: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
     },
   },
   {

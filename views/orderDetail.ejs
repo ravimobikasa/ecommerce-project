@@ -3,7 +3,9 @@
         <div class="container mt-5">
 
             <% if(locals.message) { %>
-                <h3 class=""> <%= message %></h3>
+                <h3 class="">
+                    <%= message %>
+                </h3>
                 <%}%>
                     <h3> Order Detail </h3>
                     <div class="mt-5">
@@ -12,11 +14,13 @@
                                 <% order.OrderItems.forEach( item=> { %>
 
                                     <div class=" card mb-2 p-2">
-                                        <a href="/product/<%=item.productId%>" class="block text-reset text-decoration-none">
+                                        <a href="/product/<%=item.productId%>"
+                                            class="block text-reset text-decoration-none">
 
                                             <div class="row">
                                                 <div class="cart col col-md-2 overflow-hidden">
-                                                <img class="img-fluid  mx-2" src="/../images/products/<%=item?.productImage%>" />
+                                                    <img class="img-fluid  mx-2"
+                                                        src="/../images/products/<%=item?.productImage%>" />
                                                 </div>
 
                                                 <div class="col col-md-10">
@@ -63,7 +67,7 @@
                                             <div class="row">
                                                 <h6 class="col">Order Date</h6>
                                                 <p class="col">
-                                                        <%= locals.moment(order.createdAt).format('DD-MM-YYYY hh:mm A') %>
+                                                    <%= locals.moment(order.createdAt).format('DD-MM-YYYY hh:mm A') %>
                                                 </p>
                                             </div>
                                             <div class="row">
@@ -79,32 +83,39 @@
                                                 </p>
                                             </div>
                                             <div class="row">
-                                            <h6 class="col">Shipping Address</h6>
+                                                <h6 class="col mb-1">Shipping Address</h6>
                                                 <p class="col">
-                                                    <% function getFieldWithComma(field){ if(field){ return field + ',' } return '' } %>
-                                                        <%= `${order.shippingAddressLine1},
+                                                    <% function getFieldWithComma(field){ if(field){ return field + ','
+                                                        } return '' } %>
+                                                        <%= `${getFieldWithComma(order.shippingAddressLine1)}
                                                             ${getFieldWithComma(order?.shippingAddressLine2)}${getFieldWithComma(order?.shippingLandmark)}
-                                                            ${order?.shippingCity}, ${order?.shippingState},
-                                                            ${order?.shippingCountry}, ${order?.shippingPincode}`%>
+                                                            ${getFieldWithComma(order?.shippingCity)}
+                                                            ${getFieldWithComma(order?.shippingState)}
+                                                            ${getFieldWithComma(order?.shippingCountry)}
+                                                            ${getFieldWithComma(order?.shippingPincode)}`%>
                                                 </p>
                                             </div>
-                                    </div>
-                                    <div class="row">
-                                        <h6 class="col">Total Items</h6>
-                                        <p class="col"><%= order.totalQuantity%> </p>
-                                    </div>
-                                    <div class="row">
-                                        <h6 class="col">Order Status</h6>
-                                        <p class="col"><%= order.orderStatus[0]+order.orderStatus.substring(1).toLowerCase();%> </p>
-                                    </div>
-                                    <div class="row">
-                                        <h6 class="col">Total Amount</h6>
-                                        <p class="col">₹<%= order.totalPrice%></p>
+                                        <div class="row">
+                                            <h6 class="col">Total Items</h6>
+                                            <p class="col">
+                                                <%= order.totalQuantity%>
+                                            </p>
+                                        </div>
+                                        <div class="row">
+                                            <h6 class="col">Order Status</h6>
+                                            <p class="col">
+                                                <%= order.orderStatus[0]+order.orderStatus.substring(1).toLowerCase();%>
+                                            </p>
+                                        </div>
+                                        <div class="row">
+                                            <h6 class="col">Total Amount</h6>
+                                            <p class="col">₹<%= order.totalPrice%>
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
     </section>
 
     <%- include('partials/footer.ejs') %>

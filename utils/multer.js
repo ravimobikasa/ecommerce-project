@@ -9,6 +9,10 @@ const storage = multer.diskStorage({
 })
 
 function checkFileType(req, file, cb) {
+  if (!file.originalname.match(/jpeg|jpg|png|gif/)) {
+    // upload only png and jpg format
+    req.errors = 'please upload valid image'
+  }
   const filetypes = /jpeg|jpg|png|gif/
 
   const extname = filetypes.test(path.extname(file.originalname).toLowerCase())
