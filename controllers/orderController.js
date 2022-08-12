@@ -1,6 +1,7 @@
 const { orderService } = require('../services')
 const { Cart, OrderDetail, Product, User, OrderItem } = require('../models')
 const stripe = require('../payment/stripe')
+const { Op } = require('sequelize')
 
 const stripeWebHook = async (req, res) => {
   const endpointSecret = process.env.END_POINT_SECRET
@@ -107,13 +108,71 @@ const createCheckoutSession = async (req, res) => {
   }
 }
 
-const getAllOrders = async (req, res) => {
-  console.log(req.query)
+const getAllOrders1 = async (req, res) => {
   const orders = await OrderDetail.findAll({
     include: [OrderItem],
   })
 
   res.render('orders', { orders })
+}
+
+const getAllOrders = async (req, res) => {
+  let { limit, page, search } = req.query
+
+  try {
+    limit = parseInt(limit) || 12
+    page = parseInt(page) || 1
+    let _search = search || ''
+    page = Math.abs(page)
+    let offset = page * limit - limit
+    let query
+    let count
+    if (!search) {
+      query = {
+        limit: Math.abs(limit),
+        offset: offset,
+      }
+      count = await OrderDetail.count()
+    }
+    if (search) {
+      query = {
+        where: {
+          [Op.or]: {
+            userFirstName: {
+              [Op.substring]: `${_search}`,
+            },
+            userLastName: {
+              [Op.substring]: `${_search}`,
+            },
+            id: `${_search}`,
+            orderStatus: `${_search}`,
+          },
+        },
+        limit: Math.abs(limit),
+        offset: offset,
+      }
+    }
+    count = await OrderDetail.count({
+      where: {
+        [Op.or]: {
+          userFirstName: {
+            [Op.substring]: `${_search}`,
+          },
+          userLastName: {
+            [Op.substring]: `${_search}`,
+          },
+          id: `${_search}`,
+          orderStatus: `${_search}`,
+        },
+      },
+    })
+
+    const orders = await OrderDetail.findAll(query)
+    res.render('orders', { orders, pagination: { count, limit, page, search } })
+  } catch (err) {
+    console.log(err)
+    res.render('500error')
+  }
 }
 
 const getOrder = async (req, res) => {
@@ -129,7 +188,6 @@ const getOrder = async (req, res) => {
 }
 
 const orderPaymentStatus = async (req, res) => {
-
   const { session_id, paymentStatus } = req.query
 
   const order = await OrderDetail.findOne({

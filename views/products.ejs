@@ -7,29 +7,31 @@
                 <h2>Products</h2>
             </div>
 
-            <nav class="navbar navbar-expand-lg navbar-light bg-light ">
-            
-          
-                <div class="collapse navbar-collapse " id="navbarSupportedContent">
-                  
-                  <form class="form-inline my-2 my-lg-0" method="get" action="/product">
-                    <input class="form-control mr-sm-2" name="search" type="search" placeholder="Search" aria-label="Search">
-                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-                  </form>
+
+
+            <form class="form-inline my-2 my-lg-0" method="get" action="/product">
+
+                <div class="row d-flex justify-content-center">
+                    <div class="d-flex flex-row col-6">
+                        <input class="form-control mr-sm-2" value="<%=pagination.search%>" name="search" type="search"
+                            placeholder="Search" aria-label="Search">
+                        <button class="btn btn-outline-success mx-2" type="submit">Search</button>
+
+                    </div>
                 </div>
-              </nav>
+            </form>
 
             <div class="row mt-4">
 
                 <% products?.forEach( item=> { %>
-                   
+
                     <div class="col-lg-3 mt-3">
-                        
+
                         <div class="product">
                             <div class="card r-5 shadow-sm">
                                 <a href="/product/<%=item.id%>">
-                                <img class=" card-img-top p-1 img-fluid img-thumbnail  "
-                                    src=" /../images/products/<%=item.imageUrl%>" alt="Card image">
+                                    <img class=" card-img-top p-1 img-fluid img-thumbnail  "
+                                        src=" /../images/products/<%=item.imageUrl%>" alt="Card image">
                                 </a>
                                 <div class="card-body">
                                     <h5 class="product-title ">
@@ -42,7 +44,7 @@
                                             <h5 class="price">
                                                 ₹<%= item.price %>
                                             </h5>
-                                    </div>
+                                        </div>
                                         <div class=" col d-flex justify-content-end">
                                             <form method="post" action="/cart">
                                                 <input type="hidden" name="productId" value="<%=item.id%>" />
@@ -51,34 +53,42 @@
                                             </form>
                                         </div>
                                     </div>
-                                  
+
                                 </div>
 
                             </div>
                         </div>
-                   
+
                     </div>
-                
+
 
                     <% }) %>
 
-                    <div class="d-flex justify-content-center mt-5">
-                        <nav aria-label="Page navigation example">
-                            <ul class="pagination">
-                                <li class="page-item <%= pagination.page <= 1 ? 'disabled' : '' %>">
-                                    <a class="page-link" href="/product?limit=<%=pagination.limit%>&page=<%=pagination.page-1%>">Previous</a>
-                                </li>
-                                <% for(let i =1 ; i<= Math.ceil(pagination.count/pagination.limit);i++){ %> 
-                              
-                              <li class="page-item  <%= pagination.page == i ? 'active' : '' %>"  >
-                                <a class="page-link" href="/product?limit=<%=pagination.limit%>&page=<%=i%>"><%= i %></a></li>
+                        <div class="d-flex justify-content-center mt-5">
+                            <nav aria-label="Page navigation example">
+                                <ul class="pagination">
+                                    <li class="page-item <%= pagination.page <= 1 ? 'disabled' : '' %>">
+                                        <a class="page-link"
+                                            href="/product?limit=<%=pagination.limit%>&page=<%=pagination.page-1%>&search=<%=pagination.search%>">Previous</a>
+                                    </li>
+                                    <% for(let i=1 ; i<=Math.ceil(pagination.count/pagination.limit);i++){ %>
 
-                              <% } %>
-                              <li class="page-item <%= pagination.page  >= Math.ceil(pagination.count/pagination.limit) ? 'disabled' : '' %>">
-                                <a class="page-link" href="/product?limit=<%=pagination.limit%>&page=<%=pagination.page+1%>">Next</a></li>
-                            </ul>
-                          </nav>
-                    </div>
+                                        <li class="page-item  <%= pagination.page == i ? 'active' : '' %>">
+                                            <a class="page-link"
+                                                href="/product?limit=<%=pagination.limit%>&page=<%=i%>&search=<%=pagination.search%>">
+                                                <%= i %>
+                                            </a>
+                                        </li>
+
+                                        <% } %>
+                                            <li
+                                                class="page-item <%= pagination.page  >= Math.ceil(pagination.count/pagination.limit) ? 'disabled' : '' %>">
+                                                <a class="page-link"
+                                                    href="/product?limit=<%=pagination.limit%>&page=<%=pagination.page+1%>&search=<%=pagination.search%>">Next</a>
+                                            </li>
+                                </ul>
+                            </nav>
+                        </div>
             </div>
         </div>
     </section>

@@ -1,7 +1,7 @@
 const { RESET_CONTENT } = require('http-status-codes')
 const { Product } = require('../models')
 const { Op } = require('sequelize')
-const fsPromises = require('fs/promises')
+
 const deleteImage = require('../utils/deleteImage')
 const addProduct = async (req, res) => {
   try {
@@ -86,7 +86,7 @@ const allProducts = async (req, res) => {
 
     const products = await Product.findAll(query)
 
-    res.render('products', { products: products, pagination: { count, limit, page } })
+    res.render('products', { products: products, pagination: { count, limit, page, search } })
   } catch (err) {
     res.render('500error')
   }

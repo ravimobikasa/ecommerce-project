@@ -2,8 +2,19 @@
     <section>
         <div class="container mt-5">
             <h3> Orders </h3>
-            <table class="table table-striped">
 
+            <form class="form-inline my-2 my-lg-0" method="get" action="/order">
+
+                <div class="row d-flex justify-content-center">
+                    <div class="d-flex flex-row col-6">
+                        <input class="form-control mr-sm-2" value="<%=pagination.search%>" name="search" type="search"
+                            placeholder="Search" aria-label="Search">
+                        <button class="btn btn-outline-success mx-2" type="submit">Search</button>
+
+                    </div>
+                </div>
+            </form>
+            <table class="table table-striped mt-3">
                 <thead>
                     <tr>
                         <th>OrderId</th>
@@ -37,13 +48,38 @@
     <%=item.orderStatus %>
 </td>
 
-
+<td><a type=" button" href="/order/<%=item.id%>" class="btn btn-outline-primary btn-sm">Detail</a>
+                            </td>
                         </tr>
 
-                    <% })%>
-            </tbody>
+                        <% })%>
+                </tbody>
             </table>
+            <div class="d-flex justify-content-center mt-5">
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination">
+                        <li class="page-item <%= pagination.page <= 1 ? 'disabled' : '' %>">
+                            <a class="page-link"
+                                href="/order?limit=<%=pagination.limit%>&page=<%=pagination.page-1%>&search=<%=pagination.search%>">Previous</a>
+                        </li>
+                        <% for(let i=1 ; i<=Math.ceil(pagination.count/pagination.limit);i++){ %>
 
+                            <li class="page-item  <%= pagination.page == i ? 'active' : '' %>">
+                                <a class="page-link"
+                                    href="/order?limit=<%=pagination.limit%>&page=<%=i%>&search=<%=pagination.search%>">
+                                    <%= i %>
+                                </a>
+                            </li>
+
+                            <% } %>
+                                <li
+                                    class="page-item <%= pagination.page  >= Math.ceil(pagination.count/pagination.limit) ? 'disabled' : '' %>">
+                                    <a class="page-link"
+                                        href="/order?limit=<%=pagination.limit%>&page=<%=pagination.page+1%>&search=<%=pagination.search%>">Next</a>
+                                </li>
+                    </ul>
+                </nav>
+            </div>
         </div>
     </section>
 
