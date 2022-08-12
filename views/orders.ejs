@@ -18,10 +18,11 @@
                 <thead>
                     <tr>
                         <th>OrderId</th>
-                        <th>FullName</th>
+                        <th>Full Name</th>
                         <th>Mobile No</th>
                         <th>Total Quantity</th>
                         <th>Total Price ( ₹ )</th>
+                        <th>Order Date</th>
                         <th>Order Status</th>
 
                     </tr>
@@ -29,27 +30,14 @@
                 <tbody>
                     <% orders?.forEach(item=> { %>
                         <tr>
-                            <td>
-                                <%= item.id %>
-                            </td>
-                            <td>
-                                <%= item.userFirstName +" "+item.userLastName%>
-                    </td>
-<td>
-    <%=item.userMobileNo %>
-</td>
-<td>
-    <%=item.totalQuantity %>
-</td>
-
-<td><%=item.totalPrice %></td>
-
-<td>
-    <%=item.orderStatus %>
-</td>
-
-<td><a type=" button" href="/order/<%=item.id%>" class="btn btn-outline-primary btn-sm">Detail</a>
-                            </td>
+                            <td><%= item.id %></td>
+                            <td><%= item.userFirstName +" "+item.userLastName%></td>
+                            <td><%=item.userMobileNo %></td>
+                            <td><%=item.totalQuantity %></td>
+                            <td><%=item.totalPrice %></td>
+                            <td><%= locals.moment(item.createdAt).format('DD-MM-YYYY hh:mm A') %></td>
+                            <td><%=item.orderStatus %></td>
+                            <td><a type=" button" href="/order/<%=item.id%>" class="btn btn-outline-primary btn-sm">Detail</a></td>
                         </tr>
 
                         <% })%>

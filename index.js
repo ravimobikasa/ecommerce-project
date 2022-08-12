@@ -15,6 +15,7 @@ const cartRoutes = require('./routes/cartRoutes')
 const routeNotFound = require('./middleware/notFoundError')
 const orderController = require('./controllers/orderController')
 dotenv.config()
+app.locals.moment = require('moment')
 
 app.use(
   session({
@@ -31,7 +32,7 @@ app.use(
 
 app.set('view engine', 'ejs')
 
-//before other 
+//before other
 app.post('/webhook', express.raw({ type: 'application/json' }), orderController.stripeWebHook)
 
 // Body parser, reading data from body into req.body
