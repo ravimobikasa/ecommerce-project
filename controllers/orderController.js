@@ -60,6 +60,7 @@ const createCheckoutSession = async (req, res) => {
   )}/order/failure?session_id={CHECKOUT_SESSION_ID}&paymentStatus=FAILED`
 
   try {
+    
     const user = await User.findByPk(userId)
 
     const customer = await stripe.customers.create({

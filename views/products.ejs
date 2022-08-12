@@ -1,28 +1,28 @@
 <%- include('partials/header.ejs') %>
+<<<<<<< HEAD
 
 <section>
+=======
+    <section>
+>>>>>>> 141076632b4d5ea43927a344bff88d6217aeb602
         <div class="container-fluid px-5 pt-3">
             <div class="heading ">
                 <h2>Products</h2>
             </div>
 
             <form class="form-inline my-2 my-lg-0" method="get" action="/product">
-
                 <div class="row d-flex justify-content-center">
                     <div class="d-flex flex-row col-6">
                         <input class="form-control mr-sm-2" value="<%=pagination.search%>" name="search" type="search"
                             placeholder="Search" aria-label="Search">
                         <button class="btn btn-outline-success mx-2" type="submit">Search</button>
-
                     </div>
                 </div>
             </form>
 
             <div class="row mt-4">
                 <% products?.forEach( item=> { %>
-
                     <div class="col-lg-3 mt-3">
-
                         <div class="product">
                             <div class="card r-5 shadow-sm">
                                 <a href="/product/<%=item.id%>">
@@ -35,7 +35,6 @@
                                     </h5>
 
                                     <div class="row">
-
                                         <div class="col">
                                             <h5 class="price">
                                                 ₹<%= item.price %>
@@ -49,15 +48,10 @@
                                             </form>
                                         </div>
                                     </div>
-
                                 </div>
-
                             </div>
                         </div>
-
                     </div>
-
-
                     <% }) %>
 
                         <div class="d-flex justify-content-center mt-5">
