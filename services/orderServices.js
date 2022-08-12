@@ -44,7 +44,6 @@ const createOrder = async (userId, session, { data }) => {
   if (session.payment_status === 'paid') {
     orderStatus = 'CONFIRMED'
   }
-  console.log('sf', session.payment_intent)
   const orderDetail = await OrderDetail.create({
     userId,
     totalQuantity,

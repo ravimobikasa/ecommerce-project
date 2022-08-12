@@ -3,47 +3,35 @@
         <div class="container mt-5">
 
             <% if(locals.message) { %>
-                <h3 class="">
-                    <%= message %>
-                </h3>
+                <h3 class=""> <%= message %></h3>
                 <%}%>
                     <h3> Order Detail </h3>
                     <div class="mt-5">
                         <div class="row">
                             <div class="col-md-8 ">
-
                                 <% order.OrderItems.forEach( item=> { %>
 
                                     <div class=" card mb-2 p-2">
-                                        <a href="/product/<%=item.productId%>"
-                                            class="block text-reset text-decoration-none">
+                                        <a href="/product/<%=item.productId%>" class="block text-reset text-decoration-none">
 
                                             <div class="row">
-
                                                 <div class="cart col col-md-2 overflow-hidden">
-
-                                                    <img class="img-fluid  mx-2"
-                                                        src="/../images/products/<%=item?.productImage%>" />
-
+                                                <img class="img-fluid  mx-2" src="/../images/products/<%=item?.productImage%>" />
                                                 </div>
 
                                                 <div class="col col-md-10">
-
                                                     <h5 class="mb-1">
                                                         <%= item.productTitle%>
                                                     </h5>
 
                                                     <div class="d-flex flex-row">
-
                                                         <p class="mb-0 align-self-center">Quantity:</p>
-
                                                         <p class="ms-3 mb-0 ">
                                                         <div
                                                             class="d-flex flex-row justify-content-between  align-items-center ">
                                                             <p class="m-0 me-4">
                                                                 <%= item.quantity %>
                                                             </p>
-
                                                         </div>
                                                         </p>
                                                     </div>
@@ -54,80 +42,68 @@
                                                             ₹<%= item.productPrice%>
                                                         </p>
                                                     </div>
-
                                                 </div>
                                             </div>
-
                                     </div>
                                     </a>
-
                                     <% }) %>
-
                             </div>
 
                             <div class="col-md-4 ">
-
                                 <div class="card p-3 mb-2">
                                     <h5 class="card-title">Order Details</h5>
                                     <div class="row mt-2">
                                         <div class="row mt-2">
-
-
+                                            <div class="row">
+                                                <h6 class="col">Order Id</h6>
+                                                <p class="col">
+                                                    <%= order.id%>
+                                                </p>
+                                            </div>
+                                            <div class="row">
+                                                <h6 class="col">Order Date</h6>
+                                                <p class="col">
+                                                        <%= locals.moment(order.createdAt).format('DD-MM-YYYY hh:mm A') %>
+                                                </p>
+                                            </div>
                                             <div class="row">
                                                 <h6 class="col">Full Name</h6>
                                                 <p class="col">
                                                     <%= order.userFirstName + " " +order.userLastName%>
                                                 </p>
                                             </div>
-
-
                                             <div class="row">
                                                 <h6 class="col">Mobile No.</h6>
                                                 <p class="col">
                                                     <%= order.userMobileNo%>
                                                 </p>
                                             </div>
-
                                             <div class="row">
-                                                <h6 class="col">Shipping Address</h6>
-
+                                            <h6 class="col">Shipping Address</h6>
                                                 <p class="col">
-
-                                                    <% function getFieldWithComma(field){ if(field){ return field + ','
-                                                        } return '' } %>
-
+                                                    <% function getFieldWithComma(field){ if(field){ return field + ',' } return '' } %>
                                                         <%= `${order.shippingAddressLine1},
                                                             ${getFieldWithComma(order?.shippingAddressLine2)}${getFieldWithComma(order?.shippingLandmark)}
                                                             ${order?.shippingCity}, ${order?.shippingState},
                                                             ${order?.shippingCountry}, ${order?.shippingPincode}`%>
                                                 </p>
                                             </div>
-                                        </div>
                                     </div>
-                                    <div class="row ">
+                                    <div class="row">
                                         <h6 class="col">Total Items</h6>
-                                        <p class="col">
-                                            <%= order.totalQuantity%>
-                                        </p>
+                                        <p class="col"><%= order.totalQuantity%> </p>
                                     </div>
                                     <div class="row">
                                         <h6 class="col">Order Status</h6>
-                                        <p class="col">
-                                            <%= order.orderStatus%>
-                                        </p>
+                                        <p class="col"><%= order.orderStatus[0]+order.orderStatus.substring(1).toLowerCase();%> </p>
                                     </div>
-
                                     <div class="row">
                                         <h6 class="col">Total Amount</h6>
-                                        <p class="col">
-                                            ₹<%= order.totalPrice%>
-                                        </p>
+                                        <p class="col">₹<%= order.totalPrice%></p>
                                     </div>
                                 </div>
-
                             </div>
                         </div>
-
                     </div>
     </section>
 

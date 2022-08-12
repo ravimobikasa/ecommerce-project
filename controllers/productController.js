@@ -61,9 +61,6 @@ const allProducts = async (req, res) => {
             title: {
               [Op.substring]: `${_search}`,
             },
-            description: {
-              [Op.substring]: `${_search}`,
-            },
           },
         },
         limit: Math.abs(limit),
@@ -74,9 +71,6 @@ const allProducts = async (req, res) => {
         where: {
           [Op.or]: {
             title: {
-              [Op.substring]: `${_search}`,
-            },
-            description: {
               [Op.substring]: `${_search}`,
             },
           },

@@ -3,7 +3,7 @@ const { priceValidate, isAlphabet } = require('./customValidation')
 
 const addProduct = {
   body: Joi.object().keys({
-    title: Joi.string().required().custom(isAlphabet),
+    title: Joi.string().required(),
     price: Joi.number().required().custom(priceValidate),
     description: Joi.string().required(),
   }),
@@ -17,7 +17,7 @@ const getProduct = {
 
 const updateProduct = {
   body: Joi.object().keys({
-    title: Joi.string().required().custom(isAlphabet),
+    title: Joi.string().required(),
     price: Joi.number().required().custom(priceValidate),
     description: Joi.string().required(),
   }),

@@ -27,7 +27,7 @@ const phoneNumber = (value, helpers) => {
 
 const priceValidate = (value, helpers) => {
   if (value <= 0) {
-    return helpers.message('Price should be greater tha 0')
+    return helpers.message('Price should be greater than 0')
   }
   return value
 }

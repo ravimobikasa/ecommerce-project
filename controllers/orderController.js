@@ -60,6 +60,7 @@ const createCheckoutSession = async (req, res) => {
   )}/order/failure?session_id={CHECKOUT_SESSION_ID}&paymentStatus=FAILED`
 
   try {
+    
     const user = await User.findByPk(userId)
 
     const customer = await stripe.customers.create({
@@ -195,15 +196,15 @@ const orderPaymentStatus = async (req, res) => {
     include: [OrderItem],
   })
 
-  if (!order) {
-    return res.render('404error', { errorMessage: `Order Not Found` })
-  }
-
   let message
   if (paymentStatus === 'SUCCESS') {
     message = 'Your order has been placed successfully'
   } else if (message === 'FAILED') {
     message = 'Your order has been placed successfully'
+  }
+
+  if (!order) {
+    return res.redirect('/cart')
   }
 
   res.render('orderDetail', { order, message })
