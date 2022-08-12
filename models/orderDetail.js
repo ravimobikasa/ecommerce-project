@@ -10,6 +10,12 @@ OrderDetail.init(
     userId: {
       type: DataTypes.INTEGER,
     },
+    stripeSessionId: {
+      type: DataTypes.STRING,
+    },
+    paymentIntentId: {
+      type: DataTypes.STRING,
+    },
     totalQuantity: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -20,7 +26,7 @@ OrderDetail.init(
       allowNull: false,
     },
     orderStatus: {
-      type: DataTypes.ENUM('PENDING', 'CONFIRMED', 'CANCELLED', 'SHIPPED', 'DELIVERED'),
+      type: DataTypes.ENUM('PENDING', 'CONFIRMED', 'CANCELLED', 'FAILED', 'SHIPPED', 'DELIVERED'),
       defaultValue: 'PENDING',
     },
     userFirstName: {

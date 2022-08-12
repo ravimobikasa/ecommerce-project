@@ -8,15 +8,18 @@ const stripeWebHook = async (req, res) => {
   const signature = req.headers['stripe-signature']
   try {
     let event = stripe.webhooks.constructEvent(req.body, signature, endpointSecret)
+    console.log(`Unhandled event type ${event.type}`)
 
     switch (event.type) {
       case 'payment_intent.succeeded':
+        const session = event.data.object
+        await orderService.updateOrderPaymentStatus(session, 'CONFIRMED')
         break
 
-      case 'checkout.session.completed':
-        const data = event.data.object
-        const customer = await stripe.customers.retrieve(data.customer)
+      case 'checkout.session.completed': {
         const session = event.data.object
+
+        const customer = await stripe.customers.retrieve(session.customer)
 
         const sessionDetail = await stripe.checkout.sessions.listLineItems(session.id, {
           expand: ['data.price.product'],
@@ -25,15 +28,20 @@ const stripeWebHook = async (req, res) => {
         await orderService.createOrder(customer.metadata.userId, session, sessionDetail)
 
         await Cart.destroy({ where: { userId: customer.metadata.userId } })
-        break
 
-      default:
-        console.log(`Unhandled event type ${event.type}`)
+        break
+      }
+
+      case 'checkout.session.async_payment_failed': {
+        const session = event.data.object
+        await orderService.updateOrderPaymentStatus(session, 'FAILED')
+        break
+      }
     }
 
     res.send()
   } catch (err) {
-    console.log(err?.message)
+    console.log(err)
     res.status(400).send(`Webhook Error: ${err?.message}`)
   }
 }
@@ -43,8 +51,12 @@ const createCheckoutSession = async (req, res) => {
   const allowedCountryISOCodes = ['IN']
   const userId = req.user.id
 
-  const successURL = `${req.protocol}://${req.get('host')}/order`
-  const cancelURL = `${req.protocol}://${req.get('host')}/cart`
+  const successURL = `${req.protocol}://${req.get(
+    'host'
+  )}/order/success?session_id={CHECKOUT_SESSION_ID}&paymentStatus=SUCCESS`
+  const cancelURL = `${req.protocol}://${req.get(
+    'host'
+  )}/order/failure?session_id={CHECKOUT_SESSION_ID}&paymentStatus=FAILED`
 
   try {
     const user = await User.findByPk(userId)
@@ -62,8 +74,8 @@ const createCheckoutSession = async (req, res) => {
           currency: currency,
           product_data: {
             name: item.Product.title,
-            images: [item.Product.imageUrl],
-            description: item.Product.description,
+            images: [item.Product.imageUrl || ''],
+            description: item.Product.description || 'N/A',
             metadata: {
               id: item.Product.id,
               price: item.Product.price,
@@ -96,6 +108,7 @@ const createCheckoutSession = async (req, res) => {
 }
 
 const getAllOrders = async (req, res) => {
+  console.log(req.query)
   const orders = await OrderDetail.findAll({
     include: [OrderItem],
   })
@@ -106,7 +119,7 @@ const getAllOrders = async (req, res) => {
 const getOrder = async (req, res) => {
   const { orderId } = req.params
   const order = await OrderDetail.findByPk(orderId, {
-    include : [OrderItem]
+    include: [OrderItem],
   })
 
   if (!order) {
@@ -115,9 +128,33 @@ const getOrder = async (req, res) => {
   res.render('orderDetail', { order })
 }
 
+const orderPaymentStatus = async (req, res) => {
+
+  const { session_id, paymentStatus } = req.query
+
+  const order = await OrderDetail.findOne({
+    where: { stripeSessionId: session_id },
+    include: [OrderItem],
+  })
+
+  if (!order) {
+    return res.render('404error', { errorMessage: `Order Not Found` })
+  }
+
+  let message
+  if (paymentStatus === 'SUCCESS') {
+    message = 'Your order has been placed successfully'
+  } else if (message === 'FAILED') {
+    message = 'Your order has been placed successfully'
+  }
+
+  res.render('orderDetail', { order, message })
+}
+
 module.exports = {
   createCheckoutSession,
   stripeWebHook,
   getAllOrders,
   getOrder,
+  orderPaymentStatus,
 }

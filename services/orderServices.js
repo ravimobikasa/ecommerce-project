@@ -39,6 +39,12 @@ const createOrder = async (userId, session, { data }) => {
 
   totalPrice /= 100
 
+  let orderStatus
+
+  if (session.payment_status === 'paid') {
+    orderStatus = 'CONFIRMED'
+  }
+  console.log('sf', session.payment_intent)
   const orderDetail = await OrderDetail.create({
     userId,
     totalQuantity,
@@ -46,13 +52,22 @@ const createOrder = async (userId, session, { data }) => {
     userFirstName,
     userLastName,
     userMobileNo,
-    orderStatus: 'CONFIRMED',
+    orderStatus,
+    stripeSessionId: session.id,
+    paymentIntentId: session.payment_intent,
     ...addressDetail,
   })
 
   const orderItemsResult = await createOrderItem(orderDetail.id, productDetails)
 
   return { orderDetail, orderItemsResult }
+}
+
+const updateOrderPaymentStatus = async (session, orderStatus) => {
+  const order = await OrderDetail.findOne({ where: { paymentIntentId: session.id } })
+  if (order) {
+    await order.update({ orderStatus: orderStatus })
+  }
 }
 
 const createOrderItem = async (orderId, productDetails) => {
@@ -66,4 +81,5 @@ const createOrderItem = async (orderId, productDetails) => {
 
 module.exports = {
   createOrder,
+  updateOrderPaymentStatus,
 }
