@@ -195,15 +195,15 @@ const orderPaymentStatus = async (req, res) => {
     include: [OrderItem],
   })
 
-  if (!order) {
-    return res.render('404error', { errorMessage: `Order Not Found` })
-  }
-
   let message
   if (paymentStatus === 'SUCCESS') {
     message = 'Your order has been placed successfully'
   } else if (message === 'FAILED') {
     message = 'Your order has been placed successfully'
+  }
+
+  if (!order) {
+    return res.redirect('/cart')
   }
 
   res.render('orderDetail', { order, message })
