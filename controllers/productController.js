@@ -1,15 +1,15 @@
 const { RESET_CONTENT } = require('http-status-codes')
 const { Product } = require('../models')
 const { Op } = require('sequelize')
-
 const deleteImage = require('../utils/deleteImage')
+
 const addProduct = async (req, res) => {
   try {
-    if (req.file == undefined) {
-      return res.render('addProducts', { formData: req.body, errorMessage: 'Please add a valid file' })
-    }
     if (req.errors) {
       return res.render('addProducts', { formData: req.body, errorMessage: req.errors })
+    }
+    if (req.file == undefined) {
+      return res.render('addProducts', { formData: req.body, errorMessage: 'Please add a valid file' })
     }
 
     req.body.imageUrl = req.file.filename
@@ -42,7 +42,9 @@ const allProducts = async (req, res) => {
     limit = parseInt(limit) || 12
     page = parseInt(page) || 1
     let _search = search || ''
+
     page = Math.abs(page)
+
     let offset = page * limit - limit
     let query
     let count
