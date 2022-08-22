@@ -378,6 +378,22 @@ const getMyOrders = async (req, res) => {
   }
 }
 
+const getMyOrder = async (req, res) => {
+  const { orderId } = req.params
+
+  const userId = req.user.id
+
+  const order = await OrderDetail.findOne({
+    where: { id: orderId, userId },
+    include: [OrderItem],
+  })
+
+  if (!order) {
+    return res.render('404error', { errorMessage: `Order Not Found` })
+  }
+  res.render('orderDetail', { order })
+}
+
 module.exports = {
   createCheckoutSession,
   stripeWebHook,
@@ -385,4 +401,5 @@ module.exports = {
   getOrder,
   orderPaymentStatus,
   getMyOrders,
+  getMyOrder,
 }

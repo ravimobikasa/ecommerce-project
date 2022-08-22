@@ -1,14 +1,9 @@
 <%- include('partials/header.ejs') %>
     <section>
         <div class="container mt-5">
-            <h3> <%= locals.origin=== 'myOrder' ? 'My Orders' : 'Orders' %> </h3>
+            <h3> Orders </h3>
 
-            <% const navigationURL =  locals.origin=== 'myOrder' ? 'order/myOrders' : 'order' %>
-
-
-
-
-            <form class="form-inline my-2 my-lg-0" method="get" action="/<%=navigationURL%>">
+            <form class="form-inline my-2 my-lg-0" method="get" action="/order">
 
                 <div class="row d-flex justify-content-center">
                     <div class="d-flex flex-row col-6">
@@ -53,13 +48,13 @@
                     <ul class="pagination">
                         <li class="page-item <%= pagination.page <= 1 ? 'disabled' : '' %>">
                             <a class="page-link"
-                                href="/navigationURL?limit=<%=pagination.limit%>&page=<%=pagination.page-1%>&search=<%=pagination.search%>">Previous</a>
+                                href="/order?limit=<%=pagination.limit%>&page=<%=pagination.page-1%>&search=<%=pagination.search%>">Previous</a>
                         </li>
                         <% for(let i=1 ; i<=Math.ceil(pagination.count/pagination.limit);i++){ %>
 
                             <li class="page-item  <%= pagination.page == i ? 'active' : '' %>">
                                 <a class="page-link"
-                                    href="/navigationURL?limit=<%=pagination.limit%>&page=<%=i%>&search=<%=pagination.search%>">
+                                    href="/order?limit=<%=pagination.limit%>&page=<%=i%>&search=<%=pagination.search%>">
                                     <%= i %>
                                 </a>
                             </li>
@@ -68,7 +63,7 @@
                                 <li
                                     class="page-item <%= pagination.page  >= Math.ceil(pagination.count/pagination.limit) ? 'disabled' : '' %>">
                                     <a class="page-link"
-                                        href="/navigationURL?limit=<%=pagination.limit%>&page=<%=pagination.page+1%>&search=<%=pagination.search%>">Next</a>
+                                        href="/order?limit=<%=pagination.limit%>&page=<%=pagination.page+1%>&search=<%=pagination.search%>">Next</a>
                                 </li>
                     </ul>
                 </nav>
