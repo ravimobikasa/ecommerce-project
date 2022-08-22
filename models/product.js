@@ -25,6 +25,10 @@ Product.init(
       type: DataTypes.TEXT,
       allowNull: false,
     },
+    createdBy: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
   },
   {
     sequelize,

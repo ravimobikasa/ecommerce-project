@@ -1,20 +1,21 @@
 const { RESET_CONTENT } = require('http-status-codes')
 const { Product } = require('../models')
 const { Op } = require('sequelize')
-
 const deleteImage = require('../utils/deleteImage')
+
 const addProduct = async (req, res) => {
   try {
-    if (req.file == undefined) {
-      return res.render('addProducts', { formData: req.body, errorMessage: 'Please add a valid file' })
-    }
     if (req.errors) {
       return res.render('addProducts', { formData: req.body, errorMessage: req.errors })
+    }
+    if (req.file == undefined) {
+      return res.render('addProducts', { formData: req.body, errorMessage: 'Please add a valid file' })
     }
 
     req.body.imageUrl = req.file.filename
 
     const { title, price, description, imageUrl } = req.body
+    const { id: createdBy } = req.user
 
     if (!title || !price || !description) {
       res.json('Please enter all fields')
@@ -25,6 +26,7 @@ const addProduct = async (req, res) => {
       imageUrl,
       price,
       description,
+      createdBy,
     })
 
     res.redirect('/product')
@@ -37,12 +39,15 @@ const allProducts = async (req, res) => {
     if (req.errors) {
       return res.render('products', { errorMessage: req.errors })
     }
+
     let { limit, page, search } = req.query
 
     limit = parseInt(limit) || 12
     page = parseInt(page) || 1
     let _search = search || ''
+
     page = Math.abs(page)
+
     let offset = page * limit - limit
     let query
     let count
@@ -90,6 +95,7 @@ const getProduct = async (req, res) => {
     if (req.errors) {
       return res.render('404error', { errorMessage: req.errors })
     }
+    const { id: userId } = req.user
 
     const id = req.params.id
     const query = {
@@ -98,18 +104,25 @@ const getProduct = async (req, res) => {
       },
     }
     const product = await Product.findOne(query)
+    let canEdit = false
+
+    if (userId == product.createdBy) {
+      canEdit = true
+    }
+
     if (!product) {
       return res.render('404error', { errorMessage: 'Product Not Found .....!' })
     }
-    res.render('product', { product: product })
+    res.render('product', { product: product, canEdit })
   } catch (err) {
-    res.render('500error')
+    return res.render('500error')
   }
 }
 
 const updateProduct = async (req, res) => {
   try {
     const id = req.params.id
+    const { id: userId } = req.user
 
     if (req.errors) {
       const product = await Product.findOne({
@@ -120,14 +133,20 @@ const updateProduct = async (req, res) => {
       return res.render('updateProduct', { errorMessage: req.errors, product: product })
     }
 
+    const product = await Product.findOne({
+      where: {
+        id,
+      },
+    })
+
+    if (userId != product.createdBy) {
+      return res.render('product', { errorMessage: 'You can only edit your own products', product: product, canEdit: false })
+    }
+
     if (!req.file) {
       imageUrl = undefined
     }
     if (req.file) {
-      const product = await Product.findOne({
-        where: { id },
-      })
-
       const deletePath = product.imageUrl
 
       imageUrl = req.file.filename
@@ -155,13 +174,18 @@ const updateProduct = async (req, res) => {
 const deleteProduct = async (req, res) => {
   try {
     const id = req.params.id
-
+    const { id: userId } = req.user
     const product = await Product.findOne({
       where: { id },
     })
+
     if (!product) {
       return res.json('product does not exists')
     }
+    if (userId != product.createdBy) {
+      return res.render('product', { errorMessage: 'You can only delete your own products', product: product })
+    }
+
     const filepath = './public/images/products/' + product.imageUrl
     const result = await Product.destroy({
       where: {
@@ -183,9 +207,14 @@ const getAddProductPage = (req, res) => {
 const updateProductPage = async (req, res) => {
   try {
     const { id } = req.params
-    const product = await Product.findOne({ where: { id } })
+    const { id: userId } = req.user
 
-    res.render('updateProduct', { product: product })
+    const product = await Product.findOne({ where: { id } })
+    if (userId != product.createdBy) {
+      return res.render('product', { product, errorMessage: 'You can only update your own products', canEdit: false })
+    }
+
+    return res.render('updateProduct', { product: product })
   } catch (err) {
     res.render('500error')
   }

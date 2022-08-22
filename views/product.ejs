@@ -32,6 +32,7 @@
             </div>
           </div>
           <div class="col d-flex justify-content-end">
+          <% if(canEdit==true) { %>
             <div class="">
               <form method="get" action="/product/updateProduct/<%=product.id%>">
                 <button type="submit" class="btn btn-success
@@ -39,13 +40,14 @@
                 btn-sm ">Update Product</a>
               </form>
             </div>
-
             <div class="ms-2">
               <form method="post" action="/product/<%=product.id%>" onsubmit="return myFunction()">
                 <input type="hidden" name="_method" value="delete" />
                 <button type="submit" style="float:right" class="btn btn-danger btn-sm ">Delete</a>
               </form>
             </div>
+          <% }  %>
+         
 
           </div>
         </div>
