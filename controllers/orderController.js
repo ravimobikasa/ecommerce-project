@@ -271,7 +271,6 @@ const getAllOrders = async (req, res) => {
         },
       },
     })
-
     const orders = await OrderDetail.findAll(query)
     res.render('orders', { orders, pagination: { count, limit, page, search } })
   } catch (err) {
@@ -318,10 +317,72 @@ const orderPaymentStatus = async (req, res) => {
   res.render('orderDetail', { order, message })
 }
 
+const getMyOrders = async (req, res) => {
+  let { limit, page, search } = req.query
+
+  try {
+    const userId = req.user.id
+    limit = parseInt(limit) || 12
+    page = parseInt(page) || 1
+    let _search = search || ''
+    page = Math.abs(page)
+    let offset = page * limit - limit
+    let query
+    let count
+    if (!search) {
+      query = {
+        where: {
+          userId,
+        },
+        limit: Math.abs(limit),
+        offset: offset,
+      }
+      count = await OrderDetail.count({
+        where: {
+          userId,
+        },
+      })
+    }
+    if (search) {
+      query = {
+        where: {
+          userId,
+          [Op.or]: {
+            id: `${_search}`,
+            orderStatus: {
+              [Op.substring]: `${_search}`,
+            },
+          },
+        },
+        limit: Math.abs(limit),
+        offset: offset,
+      }
+    }
+    count = await OrderDetail.count({
+      where: {
+        userId,
+        [Op.or]: {
+          id: {
+            [Op.substring]: `${_search}`,
+          },
+          orderStatus: {
+            [Op.substring]: `${_search}`,
+          },
+        },
+      },
+    })
+    const orders = await OrderDetail.findAll(query)
+    res.render('orders', { orders, origin: 'myOrder', pagination: { count, limit, page, search } })
+  } catch (err) {
+    res.render('500error')
+  }
+}
+
 module.exports = {
   createCheckoutSession,
   stripeWebHook,
   getAllOrders,
   getOrder,
   orderPaymentStatus,
+  getMyOrders,
 }
