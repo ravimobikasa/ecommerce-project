@@ -117,11 +117,15 @@ const myProducts = async (req, res) => {
         offset: offset,
         order: [['createdAt', 'DESC']],
       }
-      count = await Product.count()
+      count = await Product.count({
+        where: {
+          createdBy: userId,
+        },
+      })
     }
     let searchQuery = {
+      createdBy: userId,
       [Op.or]: {
-        createdBy: userId,
         title: {
           [Op.substring]: `${_search}`,
         },
