@@ -8,32 +8,45 @@ const stripeWebHook = async (req, res) => {
 
   const signature = req.headers['stripe-signature']
   try {
+    // verifying  stripe payload with endpointSecret
     let event = stripe.webhooks.constructEvent(req.body, signature, endpointSecret)
-    console.log(`Unhandled event type ${event.type}`)
-    console.log(event)
+
     switch (event.type) {
       case 'payment_intent.succeeded': {
         const session = event.data.object
         await orderService.updateOrderPaymentStatus(session, 'CONFIRMED')
         break
       }
-      case 'checkout.session.completed': {
+
+      case 'payment_intent.payment_failed': {
         const session = event.data.object
-
-        const customer = await stripe.customers.retrieve(session.customer)
-
-        await orderService.updateOrderBySessionId(session)
-
-        await Cart.destroy({ where: { userId: customer.metadata.userId } })
-
-        break
-      }
-
-      case 'checkout.session.async_payment_failed': {
-        const session = event.data.object
+        console.log('payment_intent.payment_failed', session)
         await orderService.updateOrderPaymentStatus(session, 'FAILED')
         break
       }
+
+      case 'checkout.session.completed': {
+        const session = event.data.object
+        const customer = await stripe.customers.retrieve(session.customer)
+
+        await orderService.updateOrderBySession(session)
+
+        // clearing the cart when order  success.
+        await Cart.destroy({ where: { userId: customer.metadata.userId } })
+      }
+
+      // handling expired session when user has not made any payment until 24 hours.
+      case 'checkout.session.expired': {
+        const session = event.data.object
+        const order = await OrderDetail.findOne({ where: { stripeSessionId: session.id } })
+
+        if (order && order.orderStatus === 'PENDING') {
+          await order.update({ orderStatus: 'FAILED' })
+        }
+        break
+      }
+      default:
+        console.log(`Unhandled event type ${event.type}`)
     }
 
     res.send()
@@ -42,14 +55,13 @@ const stripeWebHook = async (req, res) => {
     res.status(400).send(`Webhook Error: ${err?.message}`)
   }
 }
+
 const createCheckoutSession = async (req, res) => {
   const currency = 'inr'
   const allowedCountryISOCodes = ['IN']
   const userId = req.user.id
-
   try {
     const user = await User.findByPk(userId)
-
     const customer = await stripe.customers.create({
       email: user.email,
       metadata: { userId },
@@ -64,7 +76,7 @@ const createCheckoutSession = async (req, res) => {
           product_data: {
             name: item.productPrice,
             images: [item.productImage || ''],
-            description: item.productDescription || 'N/A',
+            // description: item.productDescription || 'N/A',
             metadata: {
               id: item.productId,
               price: item.productPrice,
@@ -107,7 +119,184 @@ const createCheckoutSession = async (req, res) => {
   }
 }
 
-// using stripe line items for storing the carts product details
+const getAllOrders = async (req, res) => {
+  let { limit, page, search } = req.query
+
+  try {
+    limit = parseInt(limit) || 12
+    page = parseInt(page) || 1
+    let _search = search || ''
+    page = Math.abs(page)
+    let offset = page * limit - limit
+    let query
+    let count
+    if (!search) {
+      query = {
+        order: [['createdAt', 'DESC']],
+        limit: Math.abs(limit),
+        offset: offset,
+      }
+      count = await OrderDetail.count()
+    }
+    if (search) {
+      query = {
+        where: {
+          [Op.or]: {
+            userFirstName: {
+              [Op.substring]: `${_search}`,
+            },
+            userLastName: {
+              [Op.substring]: `${_search}`,
+            },
+            id: `${_search}`,
+            orderStatus: `${_search}`,
+          },
+        },
+        limit: Math.abs(limit),
+        offset: offset,
+        order: [['createdAt', 'DESC']],
+      }
+    }
+    count = await OrderDetail.count({
+      where: {
+        [Op.or]: {
+          userFirstName: {
+            [Op.substring]: `${_search}`,
+          },
+          userLastName: {
+            [Op.substring]: `${_search}`,
+          },
+          id: `${_search}`,
+          orderStatus: `${_search}`,
+        },
+      },
+    })
+
+    const orders = await OrderDetail.findAll(query)
+    res.render('orders', { orders, pagination: { count, limit, page, search } })
+  } catch (err) {
+    console.log(err)
+    res.render('500error')
+  }
+}
+
+const getOrder = async (req, res) => {
+  const { orderId } = req.params
+
+  const order = await OrderDetail.findByPk(orderId, {
+    include: [OrderItem],
+  })
+
+  if (!order) {
+    return res.render('404error', { errorMessage: `Order Not Found` })
+  }
+  res.render('orderDetail', { order })
+}
+
+const orderPaymentStatus = async (req, res) => {
+  const { paymentStatus, session_id } = req.query
+
+  let order = await OrderDetail.findOne({ where: { stripeSessionId: session_id }, include: [OrderItem] })
+
+  if (!order) {
+    return res.redirect('/cart')
+  }
+
+  let message
+
+  if (paymentStatus.toLowerCase() === 'success') {
+    message = 'Your order has been placed successfully'
+  } else if (paymentStatus.toLowerCase() === 'failed') {
+    const session = await stripe.checkout.sessions.retrieve(session_id)
+
+    if (order && session && session.status === 'open') {
+      await stripe.checkout.sessions.expire(session_id)
+      order = await order.update({ orderStatus: 'FAILED' })
+    }
+    message = 'Your order has been failed'
+  }
+
+  res.render('orderDetail', { order, message })
+}
+
+const getMyOrders = async (req, res) => {
+  let { limit, page, search } = req.query
+
+  try {
+    const userId = req.user.id
+    limit = parseInt(limit) || 12
+    page = parseInt(page) || 1
+    let _search = search || ''
+    page = Math.abs(page)
+    let offset = page * limit - limit
+    let query
+    let count
+    if (!search) {
+      query = {
+        where: {
+          userId,
+        },
+        limit: Math.abs(limit),
+        offset: offset,
+      }
+      count = await OrderDetail.count({
+        where: {
+          userId,
+        },
+      })
+    }
+    if (search) {
+      query = {
+        where: {
+          userId,
+          [Op.or]: {
+            id: `${_search}`,
+            orderStatus: {
+              [Op.substring]: `${_search}`,
+            },
+          },
+        },
+        limit: Math.abs(limit),
+        offset: offset,
+      }
+    }
+    count = await OrderDetail.count({
+      where: {
+        userId,
+        [Op.or]: {
+          id: {
+            [Op.substring]: `${_search}`,
+          },
+          orderStatus: {
+            [Op.substring]: `${_search}`,
+          },
+        },
+      },
+    })
+    const orders = await OrderDetail.findAll(query)
+    res.render('orders', { orders, origin: 'myOrder', pagination: { count, limit, page, search } })
+  } catch (err) {
+    res.render('500error')
+  }
+}
+
+const getMyOrder = async (req, res) => {
+  const { orderId } = req.params
+
+  const userId = req.user.id
+
+  const order = await OrderDetail.findOne({
+    where: { id: orderId, userId },
+    include: [OrderItem],
+  })
+
+  if (!order) {
+    return res.render('404error', { errorMessage: `Order Not Found` })
+  }
+  res.render('orderDetail', { order })
+}
+
+// using stripe line items for storing the carts product details. Creating order after successful payment
 const stripeWebHookOld = async (req, res) => {
   const endpointSecret = process.env.END_POINT_SECRET
 
@@ -211,187 +400,6 @@ const createCheckoutSessionOld = async (req, res) => {
     console.log(err)
     res.json({ error: err })
   }
-}
-
-const getAllOrders1 = async (req, res) => {
-  const orders = await OrderDetail.findAll({
-    include: [OrderItem],
-  })
-
-  res.render('orders', { orders })
-}
-
-const getAllOrders = async (req, res) => {
-  let { limit, page, search } = req.query
-
-  try {
-    limit = parseInt(limit) || 12
-    page = parseInt(page) || 1
-    let _search = search || ''
-    page = Math.abs(page)
-    let offset = page * limit - limit
-    let query
-    let count
-    if (!search) {
-      query = {
-        limit: Math.abs(limit),
-        offset: offset,
-      }
-      count = await OrderDetail.count()
-    }
-    if (search) {
-      query = {
-        where: {
-          [Op.or]: {
-            userFirstName: {
-              [Op.substring]: `${_search}`,
-            },
-            userLastName: {
-              [Op.substring]: `${_search}`,
-            },
-            id: `${_search}`,
-            orderStatus: `${_search}`,
-          },
-        },
-        limit: Math.abs(limit),
-        offset: offset,
-      }
-    }
-    count = await OrderDetail.count({
-      where: {
-        [Op.or]: {
-          userFirstName: {
-            [Op.substring]: `${_search}`,
-          },
-          userLastName: {
-            [Op.substring]: `${_search}`,
-          },
-          id: `${_search}`,
-          orderStatus: `${_search}`,
-        },
-      },
-    })
-    const orders = await OrderDetail.findAll(query)
-    res.render('orders', { orders, pagination: { count, limit, page, search } })
-  } catch (err) {
-    console.log(err)
-    res.render('500error')
-  }
-}
-
-const getOrder = async (req, res) => {
-  const { orderId } = req.params
-  const order = await OrderDetail.findByPk(orderId, {
-    include: [OrderItem],
-  })
-
-  if (!order) {
-    return res.render('404error', { errorMessage: `Order Not Found` })
-  }
-  res.render('orderDetail', { order })
-}
-
-const orderPaymentStatus = async (req, res) => {
-  const { paymentStatus, session_id, orderId } = req.query
-
-  let order = await OrderDetail.findOne({ where: { stripeSessionId: session_id }, include: [OrderItem] })
-
-  if (!order) {
-    return res.redirect('/cart')
-  }
-
-  let message
-
-  if (paymentStatus.toLowerCase() === 'success') {
-    message = 'Your order has been placed successfully'
-  } else if (paymentStatus.toLowerCase() === 'failed') {
-    const session = await stripe.checkout.sessions.retrieve(session_id)
-
-    if (order && session && session.status === 'open') {
-      await stripe.checkout.sessions.expire(session_id)
-      order = await order.update({ orderStatus: 'FAILED' })
-    }
-    message = 'Your order has been failed'
-  }
-
-  res.render('orderDetail', { order, message })
-}
-
-const getMyOrders = async (req, res) => {
-  let { limit, page, search } = req.query
-
-  try {
-    const userId = req.user.id
-    limit = parseInt(limit) || 12
-    page = parseInt(page) || 1
-    let _search = search || ''
-    page = Math.abs(page)
-    let offset = page * limit - limit
-    let query
-    let count
-    if (!search) {
-      query = {
-        where: {
-          userId,
-        },
-        limit: Math.abs(limit),
-        offset: offset,
-      }
-      count = await OrderDetail.count({
-        where: {
-          userId,
-        },
-      })
-    }
-    if (search) {
-      query = {
-        where: {
-          userId,
-          [Op.or]: {
-            id: `${_search}`,
-            orderStatus: {
-              [Op.substring]: `${_search}`,
-            },
-          },
-        },
-        limit: Math.abs(limit),
-        offset: offset,
-      }
-    }
-    count = await OrderDetail.count({
-      where: {
-        userId,
-        [Op.or]: {
-          id: {
-            [Op.substring]: `${_search}`,
-          },
-          orderStatus: {
-            [Op.substring]: `${_search}`,
-          },
-        },
-      },
-    })
-    const orders = await OrderDetail.findAll(query)
-    res.render('orders', { orders, origin: 'myOrder', pagination: { count, limit, page, search } })
-  } catch (err) {
-    res.render('500error')
-  }
-}
-
-const getMyOrder = async (req, res) => {
-  const { orderId } = req.params
-
-  const userId = req.user.id
-
-  const order = await OrderDetail.findOne({
-    where: { id: orderId, userId },
-    include: [OrderItem],
-  })
-
-  if (!order) {
-    return res.render('404error', { errorMessage: `Order Not Found` })
-  }
-  res.render('orderDetail', { order })
 }
 
 module.exports = {
