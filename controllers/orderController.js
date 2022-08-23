@@ -1,7 +1,7 @@
 const { orderService } = require('../services')
 const { Cart, OrderDetail, Product, User, OrderItem } = require('../models')
 const stripe = require('../payment/stripe')
-const { Op, or } = require('sequelize')
+const { Op } = require('sequelize')
 
 const stripeWebHook = async (req, res) => {
   const endpointSecret = process.env.END_POINT_SECRET
@@ -10,7 +10,7 @@ const stripeWebHook = async (req, res) => {
   try {
     let event = stripe.webhooks.constructEvent(req.body, signature, endpointSecret)
     console.log(`Unhandled event type ${event.type}`)
-
+    console.log(event)
     switch (event.type) {
       case 'payment_intent.succeeded': {
         const session = event.data.object
