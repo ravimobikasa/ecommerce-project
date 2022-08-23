@@ -27,3 +27,7 @@ body {
 .bodycolor{
     background-color: #dcdc;
   }
+
+.errorMessage {
+    background: #CD5C5C;
+  }

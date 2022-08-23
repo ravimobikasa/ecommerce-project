@@ -12,6 +12,9 @@ router.use(verifySession)
 // Get All product
 router.get('/', productController.allProducts)
 
+// Get all products by that user
+router.get('/myproducts', productController.myProducts)
+
 //Add product Page
 router.get('/addProduct', productController.getAddProductPage)
 

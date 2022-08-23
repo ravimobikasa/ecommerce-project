@@ -11,7 +11,7 @@ const storage = multer.diskStorage({
 function checkFileType(req, file, cb) {
   if (!file.originalname.match(/jpeg|jpg|png|gif/)) {
     // upload only png and jpg format
-    req.errors = 'please upload valid image'
+    req.errors = 'please upload file types jpeg|jpg|png|gif'
   }
   const filetypes = /jpeg|jpg|png|gif/
 
@@ -29,7 +29,7 @@ function checkFileType(req, file, cb) {
 const upload = multer({
   storage: storage,
 
-  limits: { fileSize: 1000000 },
+  limits: { fileSize: 2 * 1024 * 1024 },
   fileFilter: function (req, file, cb) {
     checkFileType(req, file, cb)
   },

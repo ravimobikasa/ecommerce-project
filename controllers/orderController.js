@@ -3,20 +3,15 @@ const { Cart, OrderDetail, Product, User, OrderItem } = require('../models')
 const stripe = require('../payment/stripe')
 const { Op } = require('sequelize')
 
-// Stripe web hook called by stripe webhook when any of the stripe related event occur.
-
 const stripeWebHook = async (req, res) => {
-
   const endpointSecret = process.env.END_POINT_SECRET
 
   const signature = req.headers['stripe-signature']
   try {
-
     // verifying  stripe payload with endpointSecret
     let event = stripe.webhooks.constructEvent(req.body, signature, endpointSecret)
 
     switch (event.type) {
-      
       case 'payment_intent.succeeded': {
         const session = event.data.object
         await orderService.updateOrderPaymentStatus(session, 'CONFIRMED')
@@ -224,12 +219,81 @@ const orderPaymentStatus = async (req, res) => {
   res.render('orderDetail', { order, message })
 }
 
-module.exports = {
-  createCheckoutSession,
-  stripeWebHook,
-  getAllOrders,
-  getOrder,
-  orderPaymentStatus,
+const getMyOrders = async (req, res) => {
+  let { limit, page, search } = req.query
+
+  try {
+    const userId = req.user.id
+    limit = parseInt(limit) || 12
+    page = parseInt(page) || 1
+    let _search = search || ''
+    page = Math.abs(page)
+    let offset = page * limit - limit
+    let query
+    let count
+    if (!search) {
+      query = {
+        where: {
+          userId,
+        },
+        limit: Math.abs(limit),
+        offset: offset,
+      }
+      count = await OrderDetail.count({
+        where: {
+          userId,
+        },
+      })
+    }
+    if (search) {
+      query = {
+        where: {
+          userId,
+          [Op.or]: {
+            id: `${_search}`,
+            orderStatus: {
+              [Op.substring]: `${_search}`,
+            },
+          },
+        },
+        limit: Math.abs(limit),
+        offset: offset,
+      }
+    }
+    count = await OrderDetail.count({
+      where: {
+        userId,
+        [Op.or]: {
+          id: {
+            [Op.substring]: `${_search}`,
+          },
+          orderStatus: {
+            [Op.substring]: `${_search}`,
+          },
+        },
+      },
+    })
+    const orders = await OrderDetail.findAll(query)
+    res.render('orders', { orders, origin: 'myOrder', pagination: { count, limit, page, search } })
+  } catch (err) {
+    res.render('500error')
+  }
+}
+
+const getMyOrder = async (req, res) => {
+  const { orderId } = req.params
+
+  const userId = req.user.id
+
+  const order = await OrderDetail.findOne({
+    where: { id: orderId, userId },
+    include: [OrderItem],
+  })
+
+  if (!order) {
+    return res.render('404error', { errorMessage: `Order Not Found` })
+  }
+  res.render('orderDetail', { order })
 }
 
 // using stripe line items for storing the carts product details. Creating order after successful payment
@@ -338,10 +402,12 @@ const createCheckoutSessionOld = async (req, res) => {
   }
 }
 
-const getAllOrders1 = async (req, res) => {
-  const orders = await OrderDetail.findAll({
-    include: [OrderItem],
-  })
-
-  res.render('orders', { orders })
+module.exports = {
+  createCheckoutSession,
+  stripeWebHook,
+  getAllOrders,
+  getOrder,
+  orderPaymentStatus,
+  getMyOrders,
+  getMyOrder,
 }
