@@ -3,7 +3,7 @@ const sendgridTransport = require('nodemailer-sendgrid-transport')
 const transporter = nodemailer.createTransport(
   sendgridTransport({
     auth: {
-      api_key: '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',
+      api_key: process.env.SENDGRID_API_KEY,
     },
   })
 )
@@ -20,10 +20,10 @@ const message = (link) => {
 }
 const sendMail = async (to, link) => {
   const mailOptions = {
-    from: 'anshulmann012@gmail.com',
-    to: 'anshul@mobikasa.com',
+    from: process.env.FROM_MAIL,
+    to: to,
     subject: 'Reset Password Link',
-    text: message('http://localhost:3000/product'),
+    text: message(link),
   }
 
   const result = await transporter.sendMail(mailOptions)
@@ -37,10 +37,10 @@ module.exports = {
 }
 
 // const sgMail = require('@sendgrid/mail')
-// sgMail.setApiKey('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')
+// sgMail.setApiKey('')
 // const msg = {
-//   to: 'anshul@mobikasa.com', // Change to your recipient
-//   from: 'shubhamsaini@mobikasa.com', // Change to your verified sender
+//   to: '', // Change to your recipient
+//   from: '=', // Change to your verified sender
 //   subject: 'Sending with SendGrid is Fun',
 //   text: 'and easy to do anywhere, even with Node.js',
 //   html: '<strong>and easy to do anywhere, even with Node.js</strong>',
