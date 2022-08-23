@@ -17,10 +17,9 @@ router.post('/login', validate(userValidation.login), userController.login)
 router.all('/logout', userController.logOut)
 
 //Forgot Password
-router.get('/forgotPassword', userController.forgotPassword)
+router.route('/forgotPassword').get(userController.forgotPasswordPage).post(userController.forgotPassword)
 
-router.get('/resetPassword', userController.resetPassword)
-
+router.route('/resetPassword/:token').get(userController.resetPasswordPage).post(userController.resetPassword)
 router.use(verifySession)
 
 // Home page

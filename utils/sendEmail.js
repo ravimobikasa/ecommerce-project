@@ -1,5 +1,6 @@
 const nodemailer = require('nodemailer')
 const sendgridTransport = require('nodemailer-sendgrid-transport')
+
 const transporter = nodemailer.createTransport(
   sendgridTransport({
     auth: {
@@ -18,22 +19,23 @@ const message = (link) => {
     'Anshul Mann\n\n'
   )
 }
-const sendMail = async (to, link) => {
+const sendResetPasswordMail = async (to, link) => {
+  const message = `Dear User, 
+       Link to reset password is : ${link}.
+       Please do not reply to this email.
+       <b>Regards Ecommerce-Project Team.</b>`
+
   const mailOptions = {
     from: process.env.FROM_MAIL,
     to: to,
     subject: 'Reset Password Link',
-    text: message(link),
+    html: message,
   }
-
-  const result = await transporter.sendMail(mailOptions)
-
-  return result
+  return await transporter.sendMail(mailOptions)
 }
-sendMail()
 
 module.exports = {
-  sendMail,
+  sendResetPasswordMail,
 }
 
 // const sgMail = require('@sendgrid/mail')

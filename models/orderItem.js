@@ -28,7 +28,7 @@ OrderItem.init(
       type: DataTypes.STRING,
     },
     productDescription: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
     },
   },
   {

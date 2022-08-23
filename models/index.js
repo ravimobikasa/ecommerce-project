@@ -3,6 +3,7 @@ const Address = require('./address')
 const OrderDetail = require('./orderDetail')
 const OrderItem = require('./orderItem')
 const Product = require('./product')
+const ResetToken = require('./resetToken')
 
 /**
  * Relationship mapping.
@@ -18,6 +19,10 @@ User.hasMany(Address, {
 })
 
 User.hasMany(Cart, {
+  foreignKey: 'userId',
+})
+
+User.hasOne(ResetToken, {
   foreignKey: 'userId',
 })
 
@@ -57,6 +62,10 @@ Cart.belongsTo(Product, {
   foreignKey: 'productId',
 })
 
+ResetToken.belongsTo(ResetToken, {
+  foreignKey: 'userId',
+})
+
 module.exports = {
   User,
   Address,
@@ -64,4 +73,5 @@ module.exports = {
   OrderItem,
   Cart,
   Product,
+  ResetToken,
 }
