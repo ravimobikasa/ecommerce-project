@@ -2,6 +2,7 @@ const { OrderDetail, OrderItem, User, Cart, Product } = require('../models')
 const UserService = require('../services/userServices')
 
 const createOrder = async (userId) => {
+
   const userDetail = await User.findByPk(userId)
 
   const { firstName: userFirstName, lastName: userLastName, phoneNumber: userMobileNo } = userDetail
@@ -41,6 +42,58 @@ const createOrder = async (userId) => {
   return { orderDetail, orderItemsResult }
 }
 
+const updateOrderBySession = async (session) => {
+
+  const address = session.shipping_details.address
+
+  let addressDetail = {
+    shippingAddressLine1: address.line1,
+    shippingLandmark: '',
+    shippingCountry: address.country,
+    shippingState: address.state,
+    shippingCity: address.city,
+    shippingPincode: address.postal_code,
+  }
+
+  let orderStatus
+
+  if (session.payment_status === 'paid') {
+    orderStatus = 'CONFIRMED'
+  }
+
+  const order = await OrderDetail.findOne({ where: { stripeSessionId: session.id } })
+
+  await order.update({
+    orderStatus,
+    paymentIntentId: session.payment_intent,
+    ...addressDetail,
+  })
+}
+
+const updateOrderPaymentStatus = async (session, orderStatus) => {
+  const order = await OrderDetail.findOne({ where: { paymentIntentId: session.id } })
+  if (order) {
+    await order.update({ orderStatus: orderStatus })
+  }
+}
+
+const createOrderItem = async (orderId, productDetails) => {
+  
+  const orderItems = productDetails.map((item) => {
+    item.orderId = orderId
+    return item
+  })
+  const result = await OrderItem.bulkCreate(orderItems)
+  return result
+}
+
+module.exports = {
+  createOrder,
+  updateOrderPaymentStatus,
+  updateOrderBySession,
+}
+
+// creating order for old stripe method
 const createOrderOld = async (userId, session, { data }) => {
   const userDetail = await User.findByPk(userId)
 
@@ -100,53 +153,4 @@ const createOrderOld = async (userId, session, { data }) => {
   const orderItemsResult = await createOrderItem(orderDetail.id, productDetails)
 
   return { orderDetail, orderItemsResult }
-}
-
-const updateOrderBySessionId = async (session) => {
-  const address = session.shipping_details.address
-
-  let addressDetail = {
-    shippingAddressLine1: address.line1,
-    shippingLandmark: '',
-    shippingCountry: address.country,
-    shippingState: address.state,
-    shippingCity: address.city,
-    shippingPincode: address.postal_code,
-  }
-
-  let orderStatus
-
-  if (session.payment_status === 'paid') {
-    orderStatus = 'CONFIRMED'
-  }
-
-  const order = await OrderDetail.findOne({ where: { stripeSessionId: session.id } })
-
-  await order.update({
-    orderStatus,
-    paymentIntentId: session.payment_intent,
-    ...addressDetail,
-  })
-}
-
-const updateOrderPaymentStatus = async (session, orderStatus) => {
-  const order = await OrderDetail.findOne({ where: { paymentIntentId: session.id } })
-  if (order) {
-    await order.update({ orderStatus: orderStatus })
-  }
-}
-
-const createOrderItem = async (orderId, productDetails) => {
-  const orderItems = productDetails.map((item) => {
-    item.orderId = orderId
-    return item
-  })
-  const result = await OrderItem.bulkCreate(orderItems)
-  return result
-}
-
-module.exports = {
-  createOrder,
-  updateOrderPaymentStatus,
-  updateOrderBySessionId,
 }

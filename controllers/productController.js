@@ -90,6 +90,63 @@ const allProducts = async (req, res) => {
     res.render('500error')
   }
 }
+const myProducts = async (req, res) => {
+  try {
+    if (req.errors) {
+      return res.render('products', { errorMessage: req.errors })
+    }
+    const { id: userId } = req.user
+    let { limit, page, search } = req.query
+
+    limit = parseInt(limit) || 12
+    page = parseInt(page) || 1
+    let _search = search || ''
+
+    page = Math.abs(page)
+
+    let offset = page * limit - limit
+    let query
+    let count
+
+    if (!search) {
+      query = {
+        where: {
+          createdBy: userId,
+        },
+        limit: Math.abs(limit),
+        offset: offset,
+        order: [['createdAt', 'DESC']],
+      }
+      count = await Product.count()
+    }
+    let searchQuery = {
+      [Op.or]: {
+        createdBy: userId,
+        title: {
+          [Op.substring]: `${_search}`,
+        },
+      },
+    }
+    if (search) {
+      query = {
+        where: searchQuery,
+        limit: Math.abs(limit),
+        offset: offset,
+        order: [['createdAt', 'DESC']],
+      }
+      count = await Product.count({
+        where: searchQuery,
+      })
+    }
+
+    const products = await Product.findAll(query)
+    //return res.json(products)
+    return res.render('products', { products: products, pagination: { count, limit, page, search } })
+  } catch (err) {
+    //return res.json(err)
+    return res.render('500error')
+  }
+}
 const getProduct = async (req, res) => {
   try {
     if (req.errors) {
@@ -228,4 +285,5 @@ module.exports = {
   getAddProductPage,
   deleteProduct,
   updateProductPage,
+  myProducts,
 }
