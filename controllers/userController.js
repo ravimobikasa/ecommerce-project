@@ -78,6 +78,14 @@ const home = (req, res) => {
   res.redirect('/product')
 }
 
+const forgotPassword = (req, res) => {
+  res.render('forgotPassword')
+}
+
+const resetPassword = (req, res) => {
+  res.render('resetPassword')
+}
+
 module.exports = {
   registerUser,
   login,
@@ -85,4 +93,6 @@ module.exports = {
   loginPage,
   registerPage,
   home,
+  forgotPassword,
+  resetPassword,
 }

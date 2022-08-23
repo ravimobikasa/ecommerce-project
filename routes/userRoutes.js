@@ -16,6 +16,11 @@ router.post('/login', validate(userValidation.login), userController.login)
 // Logout route
 router.all('/logout', userController.logOut)
 
+//Forgot Password
+router.get('/forgotPassword', userController.forgotPassword)
+
+router.get('/resetPassword', userController.resetPassword)
+
 router.use(verifySession)
 
 // Home page
