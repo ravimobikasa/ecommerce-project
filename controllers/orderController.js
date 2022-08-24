@@ -56,6 +56,10 @@ const stripeWebHook = async (req, res) => {
   }
 }
 
+const checkoutSessionPage = (req, res) => {
+  res.render('checkout')
+}
+
 const createCheckoutSession = async (req, res) => {
   const currency = 'inr'
   const allowedCountryISOCodes = ['IN']
@@ -113,6 +117,42 @@ const createCheckoutSession = async (req, res) => {
     await orderDetail.update({ stripeSessionId: session.id })
 
     res.redirect(303, session.url)
+  } catch (err) {
+    console.log(err)
+    res.json({ error: err })
+  }
+}
+
+const createPaymentIntentCheckoutSession = async (req, res) => {
+  const currency = 'inr'
+  const allowedCountryISOCodes = ['IN']
+  const userId = req.user.id
+
+  try {
+    const user = await User.findByPk(userId)
+
+    const customer = await stripe.customers.create({
+      email: user.email,
+      metadata: { userId },
+    })
+
+    const { orderDetail, orderItemsResult } = await orderService.createOrder(userId)
+
+    const paymentIntent = await stripe.paymentIntents.create({
+      customer: customer.id,
+      setup_future_usage: 'off_session',
+      amount: orderDetail.totalPrice,
+      currency: currency,
+      automatic_payment_methods: {
+        enabled: true,
+      },
+    })
+
+    await orderDetail.update({ stripeSessionId: paymentIntent.client_secret })
+
+    res.json({
+      clientSecret: paymentIntent.client_secret,
+    })
   } catch (err) {
     console.log(err)
     res.json({ error: err })
@@ -400,7 +440,8 @@ const createCheckoutSessionOld = async (req, res) => {
 }
 
 module.exports = {
-  createCheckoutSession,
+  createCheckoutSession: createPaymentIntentCheckoutSession,
+  checkoutSessionPage,
   stripeWebHook,
   getAllOrders,
   getOrder,

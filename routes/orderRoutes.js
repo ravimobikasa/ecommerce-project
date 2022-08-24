@@ -7,7 +7,7 @@ const verifySession = require('../middleware/verifySession')
 router.use(verifySession)
 router.route('/').get(orderController.getMyOrders)
 // router.route('/').get(orderController.getAllOrders)
-router.route('/checkout-session').get(orderController.createCheckoutSession)
+router.route('/checkout-session').get(orderController.checkoutSessionPage).post(orderController.createCheckoutSession)
 router.route('/success').get(orderController.orderPaymentStatus)
 router.route('/failure').get(orderController.orderPaymentStatus)
 
