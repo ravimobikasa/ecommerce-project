@@ -19,7 +19,22 @@ const login = {
   }),
 }
 
+const verifyEmail = {
+  body: Joi.object().keys({
+    email: Joi.string().required().email().custom(isEmail),
+  }),
+}
+
+const resetPassword = {
+  body: Joi.object().keys({
+    password: Joi.string().required().custom(password),
+    newPassword: Joi.ref('password'),
+  }),
+}
+
 module.exports = {
   registerUser,
   login,
+  verifyEmail,
+  resetPassword,
 }
