@@ -86,16 +86,16 @@ const forgotPasswordPage = (req, res) => {
 }
 
 const forgotPassword = async (req, res) => {
+  if (req.errors) {
+    return res.render('forgotPassword', { formData: req.body, errorMessage: req.errors })
+  }
 
   const FORGOT_PASSWORD_TIME_LIMIT = 10 //duration in minutes
 
   const { email } = req.body
 
   try {
-
-    console.log('S1');
     const user = await User.findOne({ where: { email } })
- console.log('S2')
     if (!user) {
       // For security purpose sending this message
       return res.render('forgotPassword', { message: 'Reset password link has been sent to your mail.' })
@@ -147,6 +147,10 @@ const resetPasswordPage = async (req, res) => {
 }
 
 const resetPassword = async (req, res) => {
+  if (req.errors) {
+    return res.render('resetPassword', { errorMessage: req.errors })
+  }
+
   const { token } = req.params
   const { password } = req.body
 

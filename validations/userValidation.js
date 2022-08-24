@@ -28,7 +28,7 @@ const verifyEmail = {
 const resetPassword = {
   body: Joi.object().keys({
     password: Joi.string().required().custom(password),
-    newPassword: Joi.ref('password'),
+    confirmPassword: Joi.any().equal(Joi.ref('password')).required().options({ messages: { 'any.only': '{{#label}} does not match'} }),
   }),
 }
 
