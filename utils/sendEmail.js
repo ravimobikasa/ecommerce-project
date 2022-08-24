@@ -21,8 +21,9 @@ const message = (link) => {
 }
 const sendResetPasswordMail = async (to, link) => {
   const message = `Dear User, 
-       Link to reset password is : ${link}.
+       Link to reset password is : <a href="${link}">reset password</a>.
        Please do not reply to this email.
+       <br><br><br>
        <b>Regards Ecommerce-Project Team.</b>`
 
   const mailOptions = {
