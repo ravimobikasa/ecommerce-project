@@ -4,7 +4,6 @@ const stripe = Stripe(
   'pk_test_51LUnlrSApwaIyK3wOJUY3VDQ90CNaLKyORgAsvbXyVsf4pXoPg18w5EK7FiwCeG4Yl9mNOvnEJlrlPyD7SEbejE200TOU5nE4y'
 )
 
-console.log("It's Me", stripe)
 let elements
 
 initialize()
@@ -38,7 +37,7 @@ async function handleSubmit(e) {
     elements,
     confirmParams: {
       // Make sure to change this to your payment completion page
-      return_url: 'http://localhost:4242/checkout.html',
+      return_url: 'http://localhost:3000/order/success?paymentStatus=success',
     },
   })
 

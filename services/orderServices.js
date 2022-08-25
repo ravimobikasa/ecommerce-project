@@ -2,7 +2,6 @@ const { OrderDetail, OrderItem, User, Cart, Product } = require('../models')
 const UserService = require('../services/userServices')
 
 const createOrder = async (userId) => {
-
   const userDetail = await User.findByPk(userId)
 
   const { firstName: userFirstName, lastName: userLastName, phoneNumber: userMobileNo } = userDetail
@@ -43,7 +42,6 @@ const createOrder = async (userId) => {
 }
 
 const updateOrderBySession = async (session) => {
-
   const address = session.shipping_details.address
 
   let addressDetail = {
@@ -71,14 +69,14 @@ const updateOrderBySession = async (session) => {
 }
 
 const updateOrderPaymentStatus = async (session, orderStatus) => {
-  const order = await OrderDetail.findOne({ where: { paymentIntentId: session.id } })
+  console.log(session)
+  const order = await OrderDetail.findOne({ where: { paymentIntentId: session.client_secret } })
   if (order) {
     await order.update({ orderStatus: orderStatus })
   }
 }
 
 const createOrderItem = async (orderId, productDetails) => {
-  
   const orderItems = productDetails.map((item) => {
     item.orderId = orderId
     return item

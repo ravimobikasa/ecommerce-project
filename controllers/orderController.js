@@ -1,7 +1,7 @@
 const { orderService } = require('../services')
-const { Cart, OrderDetail, Product, User, OrderItem } = require('../models')
+const { Cart, OrderDetail, Product, User, OrderItem, StripeCustomer, CardDetail } = require('../models')
 const stripe = require('../payment/stripe')
-const { Op } = require('sequelize')
+const { Op, DataTypes } = require('sequelize')
 
 const stripeWebHook = async (req, res) => {
   const endpointSecret = process.env.END_POINT_SECRET
@@ -14,7 +14,47 @@ const stripeWebHook = async (req, res) => {
     switch (event.type) {
       case 'payment_intent.succeeded': {
         const session = event.data.object
+
+        const customer = await stripe.customers.retrieve(session.customer)
+
+        /*       const paymentMethods = await stripe.paymentMethods.list({
+                 customer: customer.id,
+                 type: 'card',
+               })*/
+
+        const stripeCustomer = await StripeCustomer.findOne({
+          where: { stripeCustomerId: customer.id },
+          include: [User],
+        })
+
+        const userId = stripeCustomer.User.id
+
+        const paymentInfo = session.charges.data[0]
+
+        const paymentMethodDetails = paymentInfo.payment_method_details.card
+
+        const oldCardDetail = await CardDetail.findOne({
+          where: {
+            userId,
+            cardFingerPrint: paymentMethodDetails.fingerprint,
+          },
+        })
+
+        if (!oldCardDetail) {
+          const cardDetail = await CardDetail.create({
+            userId: stripeCustomer.userId,
+            cardLastFour: paymentMethodDetails.last4,
+            cardExpiry: `${paymentMethodDetails.exp_month}/${paymentMethodDetails.exp_year}`,
+            cardType: paymentMethodDetails.brand,
+            cardFingerPrint: paymentMethodDetails.fingerprint,
+            paymentMethodId: paymentInfo.payment_method,
+          })
+        }
+
         await orderService.updateOrderPaymentStatus(session, 'CONFIRMED')
+
+        // clearing the cart when order  success.
+        await Cart.destroy({ where: { userId: customer.metadata.userId } })
         break
       }
 
@@ -29,10 +69,11 @@ const stripeWebHook = async (req, res) => {
         const session = event.data.object
         const customer = await stripe.customers.retrieve(session.customer)
 
-        await orderService.updateOrderBySession(session)
+        // await orderService.updateOrderBySession(session)
 
         // clearing the cart when order  success.
-        await Cart.destroy({ where: { userId: customer.metadata.userId } })
+        // await Cart.destroy({ where: { userId: customer.metadata.userId } })
+        break
       }
 
       // handling expired session when user has not made any payment until 24 hours.
@@ -56,8 +97,19 @@ const stripeWebHook = async (req, res) => {
   }
 }
 
-const checkoutSessionPage = (req, res) => {
-  res.render('checkout')
+const checkoutSessionPage = async (req, res) => {
+  const userId = req.user.id
+  const products = await Cart.findAll({ where: { userId }, include: [Product] })
+
+  let totalItem = 0
+  let totalPrice = 0
+
+  products.forEach((item) => {
+    totalItem += item.quantity
+    totalPrice += item.Product.price * item.quantity
+  })
+
+  res.render('checkout', { products: products, totalItem, totalPrice })
 }
 
 const createCheckoutSession = async (req, res) => {
@@ -125,30 +177,59 @@ const createCheckoutSession = async (req, res) => {
 
 const createPaymentIntentCheckoutSession = async (req, res) => {
   const currency = 'inr'
-  const allowedCountryISOCodes = ['IN']
   const userId = req.user.id
+  const { cardId } = req.body
 
   try {
-    const user = await User.findByPk(userId)
-
-    const customer = await stripe.customers.create({
-      email: user.email,
-      metadata: { userId },
+    const user = await User.findByPk(userId, {
+      include: [StripeCustomer],
     })
 
+    let customer
+
+    if (user.StripeCustomer) {
+      customer = await stripe.customers.retrieve(user.StripeCustomer.stripeCustomerId)
+    } else {
+      customer = await stripe.customers.create({
+        email: user.email,
+        metadata: { userId },
+      })
+      await StripeCustomer.create({ userId: userId, stripeCustomerId: customer.id })
+    }
+
     const { orderDetail, orderItemsResult } = await orderService.createOrder(userId)
+
+    let cardDetail
+    if (cardId) {
+      cardDetail = await CardDetail.findOne({ where: { id: cardId, userId } })
+
+      const paymentIntent = await stripe.paymentIntents.create({
+        customer: customer.id,
+        amount: orderDetail.totalPrice * 100,
+        currency,
+        off_session: true,
+        payment_method: cardDetail.paymentMethodId,
+        confirm: true,
+      })
+
+      await orderDetail.update({ paymentIntentId: paymentIntent.client_secret })
+
+      return res.json({ message: 'payment done' })
+    }
 
     const paymentIntent = await stripe.paymentIntents.create({
       customer: customer.id,
       setup_future_usage: 'off_session',
-      amount: orderDetail.totalPrice,
+      amount: orderDetail.totalPrice * 100,
       currency: currency,
       automatic_payment_methods: {
         enabled: true,
       },
     })
 
-    await orderDetail.update({ stripeSessionId: paymentIntent.client_secret })
+    await orderDetail.update({ paymentIntentId: paymentIntent.client_secret })
+
+    console.log('Payment Intent', paymentIntent)
 
     res.json({
       clientSecret: paymentIntent.client_secret,
@@ -234,9 +315,12 @@ const getOrder = async (req, res) => {
 }
 
 const orderPaymentStatus = async (req, res) => {
-  const { paymentStatus, session_id } = req.query
+  const { paymentStatus, payment_intent_client_secret } = req.query
 
-  let order = await OrderDetail.findOne({ where: { stripeSessionId: session_id }, include: [OrderItem] })
+  let order = await OrderDetail.findOne({
+    where: { paymentIntentId: payment_intent_client_secret },
+    include: [OrderItem],
+  })
 
   if (!order) {
     return res.redirect('/cart')
