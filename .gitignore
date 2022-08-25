@@ -6,7 +6,7 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 
- public/images/products
+ public/
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
@@ -109,6 +109,7 @@ dist
 # vscode file removed
 .vscode
 
+public/
 
 # Ignore mac specific file
 .DS_Store
