@@ -100,7 +100,7 @@ const stripeWebHook = async (req, res) => {
 const checkoutSessionPage = async (req, res) => {
   const userId = req.user.id
   const products = await Cart.findAll({ where: { userId }, include: [Product] })
-
+  const cardDetails = await CardDetail.findAll({ where: { userId } })
   let totalItem = 0
   let totalPrice = 0
 
@@ -109,7 +109,11 @@ const checkoutSessionPage = async (req, res) => {
     totalPrice += item.Product.price * item.quantity
   })
 
-  res.render('checkout', { products: products, totalItem, totalPrice })
+  res.render('checkout', { products, totalItem, totalPrice, cardDetails })
+}
+
+const stripePaymentCheckoutPage = (req, res) => {
+  res.render('stripeCheckoutPayment')
 }
 
 const createCheckoutSession = async (req, res) => {
@@ -200,6 +204,7 @@ const createPaymentIntentCheckoutSession = async (req, res) => {
     const { orderDetail, orderItemsResult } = await orderService.createOrder(userId)
 
     let cardDetail
+
     if (cardId) {
       cardDetail = await CardDetail.findOne({ where: { id: cardId, userId } })
 
@@ -214,7 +219,7 @@ const createPaymentIntentCheckoutSession = async (req, res) => {
 
       await orderDetail.update({ paymentIntentId: paymentIntent.client_secret })
 
-      return res.json({ message: 'payment done' })
+      return res.redirect(`/order/success?paymentStatus=success&payment_intent_client_secret=${paymentIntent.client_secret}`)
     }
 
     const paymentIntent = await stripe.paymentIntents.create({
@@ -228,8 +233,6 @@ const createPaymentIntentCheckoutSession = async (req, res) => {
     })
 
     await orderDetail.update({ paymentIntentId: paymentIntent.client_secret })
-
-    console.log('Payment Intent', paymentIntent)
 
     res.json({
       clientSecret: paymentIntent.client_secret,
@@ -315,10 +318,11 @@ const getOrder = async (req, res) => {
 }
 
 const orderPaymentStatus = async (req, res) => {
+  const userId = req.user.id
   const { paymentStatus, payment_intent_client_secret } = req.query
 
   let order = await OrderDetail.findOne({
-    where: { paymentIntentId: payment_intent_client_secret },
+    where: { userId, paymentIntentId: payment_intent_client_secret },
     include: [OrderItem],
   })
 
@@ -526,6 +530,7 @@ const createCheckoutSessionOld = async (req, res) => {
 module.exports = {
   createCheckoutSession: createPaymentIntentCheckoutSession,
   checkoutSessionPage,
+  stripePaymentCheckoutPage,
   stripeWebHook,
   getAllOrders,
   getOrder,

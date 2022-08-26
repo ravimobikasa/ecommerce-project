@@ -6,85 +6,85 @@
             <div class="row">
 
                 <div class="col-md-8 ">
-                    <p class="<%= products?.length > 0 ? "d-none" : "d-block" ;%>">
+                    <p class="<%= products?.length > 0 ? "d-none" : "d-block"; %>">
                         Your Shopping Cart is Empty
                     </p>
                     <% products?.forEach( item=> { %>
 
-                    <div class=" card mb-2 p-2">
-                        <div class="row">
-                            <div class="cart col col-md-2 overflow-hidden">
+                        <div class=" card mb-2 p-2">
+                            <div class="row">
+                                <div class="cart col col-md-2 overflow-hidden">
 
-                                <a href="/product/<%= item.Product.id ;%>">
-                                    <img class="img-fluid  mx-2"
-                                         src="/../images/products/<%= item.Product.imageUrl ;%>" />
+                                    <a href="/product/<%= item.Product.id; %>">
+                                        <img class="img-fluid  mx-2"
+                                             src="/../images/products/<%= item.Product.imageUrl; %>" />
 
-                                </a>
-                            </div>
+                                    </a>
+                                </div>
 
-                            <div class="col col-md-10">
+                                <div class="col col-md-10">
 
-                                <h5 class="mb-1">
-                                    <%= item.Product.title ;%>
-                                </h5>
+                                    <h5 class="mb-1">
+                                        <%= item.Product.title; %>
+                                    </h5>
 
-                                <div class="d-flex flex-row">
+                                    <div class="d-flex flex-row">
 
-                                    <p class="mb-0 align-self-center">Quantity:</p>
+                                        <p class="mb-0 align-self-center">Quantity:</p>
 
-                                    <p class="ms-3 mb-0 ">
-                                    <div
-                                            class="d-flex flex-row justify-content-between  rounded-3 border align-items-center ">
+                                        <p class="ms-3 mb-0 ">
+                                        <div
+                                                class="d-flex flex-row justify-content-between  rounded-3 border align-items-center ">
 
-                                        <form action="/cart" method="POST">
-                                            <input type="hidden" name="productId"
-                                                   value="<%= item.Product.id ;%>" />
-                                            <input type="hidden" name="_method" value="delete" />
-                                            <button type="submit"
-                                                    class="btn btn-outline-dark btn-sm  me-4 py-0 " value="-">
-                                                -
-                                            </button>
+                                            <form action="/cart" method="POST">
+                                                <input type="hidden" name="productId"
+                                                       value="<%= item.Product.id; %>" />
+                                                <input type="hidden" name="_method" value="delete" />
+                                                <button type="submit"
+                                                        class="btn btn-outline-dark btn-sm  me-4 py-0 " value="-">
+                                                    -
+                                                </button>
 
-                                        </form>
-                                        <p class="m-0 me-4">
-                                            <%= item.quantity ;%>
+                                            </form>
+                                            <p class="m-0 me-4">
+                                                <%= item.quantity; %>
+                                            </p>
+
+                                            <form action="/cart" method="post">
+                                                <input type="hidden" name="_method" />
+                                                <input type="hidden" name="productId"
+                                                       value="<%= item.Product.id; %>" />
+                                                <button type="submit" class="btn btn-outline-dark btn-sm py-0 "
+                                                        value="+">
+                                                    +
+                                                </button>
+                                            </form>
+
+                                        </div>
                                         </p>
 
-                                        <form action="/cart" method="post">
-                                            <input type="hidden" name="_method" />
-                                            <input type="hidden" name="productId"
-                                                   value="<%= item.Product.id ;%>" />
-                                            <button type="submit" class="btn btn-outline-dark btn-sm py-0 "
-                                                    value="+">
-                                                +
-                                            </button>
-                                        </form>
-
                                     </div>
-                                    </p>
+
+                                    <div class="d-flex flex-row mt-1">
+                                        <p class="mb-0">Price:</p>
+                                        <p class="ms-2 mb-0">
+                                            ₹<%= item.Product.price; %>
+                                        </p>
+                                    </div>
+                                    <form method="post" action="/cart/remove/<%= item.Product.id; %>">
+                                        <button type="submit" style="float:right"
+                                                class="btn btn-primary btn-sm ">Remove</a>
+                                    </form>
 
                                 </div>
-
-                                <div class="d-flex flex-row mt-1">
-                                    <p class="mb-0">Price:</p>
-                                    <p class="ms-2 mb-0">
-                                        ₹<%= item.Product.price ;%>
-                                    </p>
-                                </div>
-                                <form method="post" action="/cart/remove/<%= item.Product.id ;%>">
-                                    <button type="submit" style="float:right"
-                                            class="btn btn-primary btn-sm ">Remove</a>
-                                </form>
-
                             </div>
-                        </div>
 
-                    </div>
+                        </div>
                     <% }); %>
 
                 </div>
 
-                <div class="col-md-4 <%= products?.length > 0 ? "d-block" : "d-none" ;%>">
+                <div class="col-md-4 <%= products?.length > 0 ? "d-block" : "d-none"; %>">
 
                     <div class="card p-3">
                         <h5 class="card-title">Price Details</h5>
@@ -92,20 +92,20 @@
                         <div class="row mt-2">
                             <h6 class="col">Total Items</h6>
                             <p class="col">
-                                <%= totalItem ;%>
+                                <%= totalItem; %>
                             </p>
                         </div>
 
                         <div class="row ">
                             <h6 class="col">Total Amount</h6>
                             <p class="col">
-                                ₹<%= totalPrice ;%>
+                                ₹<%= totalPrice; %>
                             </p>
                         </div>
 
 
                         <a type="button" class="btn btn-primary  btn-block rounded mt-3"
-                           href="/order/checkout-session">Checkout</a>
+                           href="/order/checkoutSession">Checkout</a>
 
                     </div>
 

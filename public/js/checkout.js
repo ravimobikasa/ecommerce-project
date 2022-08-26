@@ -13,7 +13,7 @@ document.querySelector('#payment-form').addEventListener('submit', handleSubmit)
 
 // Fetches a payment intent and captures the client secret
 async function initialize() {
-  const response = await fetch('http://localhost:3000/order/checkout-session', {
+  const response = await fetch('http://localhost:3000/order/checkoutS' + 'ession', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
   })
